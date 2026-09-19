@@ -1184,3 +1184,37 @@ main::before {
   .stock-category-grid { grid-template-columns: 1fr 1fr; }
   .stock-category-grid button { min-height: 112px; }
 }
+
+/* Multiple savings goals */
+.goals-overview { margin-bottom: 18px; }
+.goals-heading { display: flex; align-items: center; justify-content: space-between; gap: 16px; margin-bottom: 15px; }
+.goals-heading h2 { margin: 0; }
+.goal-grid { display: grid; grid-template-columns: repeat(2, 1fr); gap: 14px; }
+.empty-goals { grid-column: 1 / -1; padding: 34px; color: var(--muted); text-align: center; background: rgba(10, 12, 18, .55); border: 1px dashed var(--line); border-radius: 16px; }
+.goal-card {
+  position: relative;
+  overflow: hidden;
+  padding: 22px;
+  background: linear-gradient(145deg, rgba(169, 135, 255, .11), rgba(8, 15, 18, .9));
+  border: 1px solid rgba(169, 135, 255, .22);
+  border-radius: 17px;
+}
+.goal-card::after { position: absolute; top: -45px; right: -30px; width: 110px; height: 110px; background: radial-gradient(circle, rgba(169, 135, 255, .2), transparent 68%); content: ""; }
+.goal-card.primary-goal { border-color: var(--green); box-shadow: 0 0 26px rgba(var(--theme-rgb), .1); }
+.goal-card-top { position: relative; z-index: 1; display: flex; align-items: center; justify-content: space-between; gap: 10px; }
+.goal-type-badge { padding: 5px 8px; color: var(--green-light); font-family: "DM Mono", monospace; font-size: 8px; letter-spacing: 1px; background: rgba(var(--theme-rgb), .1); border-radius: 99px; }
+.goal-date { color: var(--muted); font-size: 11px; }
+.goal-card h2 { position: relative; z-index: 1; margin-top: 24px; font-size: 25px; }
+.goal-amounts { margin: 0 0 15px; color: var(--muted); font-size: 13px; }
+.goal-progress-track { height: 10px; overflow: hidden; background: rgba(255, 255, 255, .07); border-radius: 99px; }
+.goal-progress-track i { display: block; height: 100%; background: linear-gradient(90deg, var(--green), #63a8ff); border-radius: inherit; box-shadow: 0 0 14px rgba(var(--theme-rgb), .35); }
+.goal-progress-text { display: flex; justify-content: space-between; gap: 12px; margin-top: 9px; font-size: 11px; }
+.goal-progress-text strong { color: var(--green-light); }
+.goal-progress-text span { color: var(--muted); }
+.goal-actions { display: flex; gap: 10px; margin-top: 20px; padding-top: 13px; border-top: 1px solid rgba(var(--theme-rgb), .12); }
+.goal-actions button { padding: 4px 0; color: var(--green); font-family: inherit; font-size: 11px; background: transparent; border: 0; cursor: pointer; }
+.goal-actions button:last-child { margin-left: auto; color: var(--muted); }
+
+@media (max-width: 700px) {
+  .goal-grid { grid-template-columns: 1fr; }
+}

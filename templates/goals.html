@@ -11,12 +11,14 @@
   <a class="primary-button" href="#goal-form">Add Goal</a>
 </section>
 
-<section class="money-cards">
-  <article class="card">
-    <p id="saved-goal-name">No goal yet</p>
-    <h2 id="saved-goal-progress">—</h2>
-    <span id="saved-goal-description">Create a savings goal to begin.</span>
-  </article>
+<section class="goals-overview">
+  <div class="goals-heading">
+    <div><p class="label">SAVED GOALS</p><h2>Everything you are working toward</h2></div>
+    <span id="goal-count" class="simple-badge">0 goals</span>
+  </div>
+  <div id="goal-list" class="goal-grid">
+    <div class="empty-goals">No goals yet. Add your first goal below.</div>
+  </div>
 </section>
 
 <section class="panel">
@@ -58,40 +60,97 @@
       </select>
     </p>
 
-    <button class="primary-button" type="submit">Save Goal</button>
+    <button class="primary-button" type="submit">Add Goal</button>
     <span id="goal-status" style="margin-left: 10px;"></span>
   </form>
 </section>
 
 <script>
-  const GOAL_KEY = "lifepath_goal";
+  const LEGACY_GOAL_KEY = "lifepath_goal";
+  const GOALS_KEY = "lifepath_goals_v2";
   const form = document.getElementById("goal-form");
+  let goals = loadGoals();
 
-  function renderGoal(goal) {
-    if (!goal || !goal.goal_name) return;
-    const target = Number(goal.target_amount);
-    const current = Number(goal.current_amount);
-    const progress = target > 0 ? Math.min(100, current / target * 100) : 0;
-    document.getElementById("saved-goal-name").textContent = goal.goal_name;
-    document.getElementById("saved-goal-progress").textContent = `${progress.toFixed(0)}%`;
-    document.getElementById("saved-goal-description").textContent =
-      `$${current.toFixed(2)} of $${target.toFixed(2)} by ${goal.target_date}`;
+  function newId() {
+    return crypto.randomUUID ? crypto.randomUUID() : `${Date.now()}-${Math.random()}`;
   }
 
-  const savedGoal = JSON.parse(localStorage.getItem(GOAL_KEY) || "null");
-  if (savedGoal) {
-    Object.entries(savedGoal).forEach(([name, value]) => {
-      if (form.elements[name]) form.elements[name].value = value;
-    });
-    renderGoal(savedGoal);
+  function loadGoals() {
+    try {
+      const saved = JSON.parse(localStorage.getItem(GOALS_KEY) || "[]");
+      if (Array.isArray(saved) && saved.length) return saved;
+      const oldGoal = JSON.parse(localStorage.getItem(LEGACY_GOAL_KEY) || "null");
+      if (oldGoal?.goal_name) {
+        const migrated = [{ ...oldGoal, id: newId(), primary: true }];
+        localStorage.setItem(GOALS_KEY, JSON.stringify(migrated));
+        return migrated;
+      }
+    } catch {}
+    return [];
   }
+
+  function money(value) {
+    return new Intl.NumberFormat("en-US", { style: "currency", currency: "USD", maximumFractionDigits: 0 }).format(value);
+  }
+
+  function saveGoals() {
+    if (goals.length && !goals.some(goal => goal.primary)) goals[0].primary = true;
+    localStorage.setItem(GOALS_KEY, JSON.stringify(goals));
+    const primary = goals.find(goal => goal.primary) || null;
+    if (primary) localStorage.setItem(LEGACY_GOAL_KEY, JSON.stringify(primary));
+    else localStorage.removeItem(LEGACY_GOAL_KEY);
+    renderGoals();
+  }
+
+  function setPrimary(id) {
+    goals.forEach(goal => goal.primary = goal.id === id);
+    saveGoals();
+    document.getElementById("goal-status").textContent = "Primary goal updated for the AI Coach.";
+  }
+
+  function removeGoal(id) {
+    goals = goals.filter(goal => goal.id !== id);
+    saveGoals();
+    document.getElementById("goal-status").textContent = "Goal removed.";
+  }
+
+  function renderGoals() {
+    const list = document.getElementById("goal-list");
+    document.getElementById("goal-count").textContent = `${goals.length} goal${goals.length === 1 ? "" : "s"}`;
+    if (!goals.length) {
+      const empty = document.createElement("div"); empty.className = "empty-goals"; empty.textContent = "No goals yet. Add your first goal below."; list.replaceChildren(empty); return;
+    }
+    list.replaceChildren(...goals.map(goal => {
+      const target = Number(goal.target_amount); const current = Number(goal.current_amount);
+      const progress = target > 0 ? Math.min(100, current / target * 100) : 0;
+      const card = document.createElement("article"); card.className = `goal-card${goal.primary ? " primary-goal" : ""}`;
+      const top = document.createElement("div"); top.className = "goal-card-top";
+      const badge = document.createElement("span"); badge.className = "goal-type-badge"; badge.textContent = goal.primary ? "AI PRIMARY GOAL" : goal.risk_comfort.toUpperCase();
+      const date = document.createElement("span"); date.className = "goal-date"; date.textContent = new Date(`${goal.target_date}T12:00:00`).toLocaleDateString("en-US", { month: "short", year: "numeric" }); top.append(badge, date);
+      const title = document.createElement("h2"); title.textContent = goal.goal_name;
+      const amounts = document.createElement("p"); amounts.className = "goal-amounts"; amounts.textContent = `${money(current)} saved of ${money(target)}`;
+      const track = document.createElement("div"); track.className = "goal-progress-track"; const fill = document.createElement("i"); fill.style.width = `${progress}%`; track.appendChild(fill);
+      const progressText = document.createElement("div"); progressText.className = "goal-progress-text";
+      const percent = document.createElement("strong"); percent.textContent = `${progress.toFixed(0)}% complete`;
+      const monthly = document.createElement("span"); monthly.textContent = `${money(goal.monthly_contribution)} planned monthly`; progressText.append(percent, monthly);
+      const actions = document.createElement("div"); actions.className = "goal-actions";
+      if (!goal.primary) { const primary = document.createElement("button"); primary.type = "button"; primary.textContent = "Use for AI plan"; primary.addEventListener("click", () => setPrimary(goal.id)); actions.appendChild(primary); }
+      const remove = document.createElement("button"); remove.type = "button"; remove.textContent = "Remove"; remove.addEventListener("click", () => removeGoal(goal.id)); actions.appendChild(remove);
+      card.append(top, title, amounts, track, progressText, actions); return card;
+    }));
+  }
+
+  document.querySelector('input[name="target_date"]').min = new Date().toISOString().slice(0, 10);
 
   form.addEventListener("submit", (event) => {
     event.preventDefault();
-    const goal = Object.fromEntries(new FormData(form).entries());
-    localStorage.setItem(GOAL_KEY, JSON.stringify(goal));
-    renderGoal(goal);
-    document.getElementById("goal-status").textContent = "Saved on this device.";
+    const goal = { ...Object.fromEntries(new FormData(form).entries()), id: newId(), primary: goals.length === 0 };
+    goals.push(goal);
+    saveGoals();
+    form.reset();
+    document.getElementById("goal-status").textContent = "Goal added without replacing your other goals.";
   });
+
+  renderGoals();
 </script>
 {% endblock %}

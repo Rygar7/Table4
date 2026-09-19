@@ -26,7 +26,11 @@ def _client() -> OpenAI:
 
 def _extract_json(text: str) -> dict:
     cleaned = re.sub(r"^```(?:json)?\s*|\s*```$", "", text.strip(), flags=re.IGNORECASE)
-    return json.loads(cleaned)
+    start = cleaned.find("{")
+    if start == -1:
+        raise ValueError("Model response did not contain JSON")
+    parsed, _ = json.JSONDecoder().raw_decode(cleaned[start:])
+    return parsed
 
 
 def _fallback_coach(analysis: FinancialAnalysis) -> CoachResponse:

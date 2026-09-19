@@ -7,6 +7,8 @@ from fastapi.staticfiles import StaticFiles
 from fastapi.templating import Jinja2Templates
 
 from .finance import analyze_profile
+from .credit import analyze_credit
+from .credit_coach import create_credit_advice
 from .market import (
     MarketDataError,
     calculate_stock_metrics,
@@ -20,6 +22,8 @@ from .market import (
 from .models import (
     FinancialAnalysis,
     FinancialProfile,
+    CreditAdvice,
+    CreditProfile,
     MarketNewsItem,
     MarketResearch,
     MarketTrend,
@@ -86,6 +90,11 @@ def ideas_page(request: Request):
     return templates.TemplateResponse(request=request, name="ideas.html")
 
 
+@app.get("/accounts", include_in_schema=False)
+def accounts_page(request: Request):
+    return templates.TemplateResponse(request=request, name="accounts.html")
+
+
 @app.get("/nemotron", include_in_schema=False)
 def nemotron_page(request: Request):
     return templates.TemplateResponse(request=request, name="nemotron.html")
@@ -112,6 +121,12 @@ def plan(profile: FinancialProfile) -> PlanResponse:
             "tax, legal, or investment advice."
         ),
     )
+
+
+@app.post("/api/v1/credit/advice", response_model=CreditAdvice)
+def credit_advice(profile: CreditProfile) -> CreditAdvice:
+    metrics = analyze_credit(profile)
+    return create_credit_advice(profile, metrics)
 
 
 @app.get("/api/v1/market/research", response_model=MarketResearch)

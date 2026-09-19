@@ -28,9 +28,14 @@ Open `http://127.0.0.1:8000/docs` for the interactive API documentation.
   sourced portfolio examples, and Nemotron-generated research ideas.
 - `POST /api/v1/market/suggestions` returns a three-item beginner research shortlist
   based on time horizon, risk comfort, verified trends, and current sourced news.
+- `POST /api/v1/credit/advice` calculates card utilization and debt totals, then asks
+  Nemotron to rank three educational credit-improvement priorities.
 
 Open `http://127.0.0.1:8000/stocks` to use the connected stock lookup page.
 Open `http://127.0.0.1:8000/ideas` for the simplified Suggested Trades experience.
+Open `http://127.0.0.1:8000/accounts` to add bank balances, credit cards, and loans.
+The bank connection is clearly marked demo-only; production bank linking requires a
+user-authorized provider such as Plaid Link.
 The Money and Goals pages save prototype data in the browser, and the AI Coach page sends
 that structured profile to the planning endpoint.
 

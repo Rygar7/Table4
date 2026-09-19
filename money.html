@@ -1,0 +1,92 @@
+{% extends "base.html" %}
+
+{% block content %}
+<section class="welcome">
+  <div>
+    <p class="label">YOUR FINANCIAL DETAILS</p>
+    <h1>My Money</h1>
+    <p>Add the information the simulator needs.</p>
+  </div>
+</section>
+
+<section class="panel">
+  <p class="label">INCOME AND TAXES</p>
+  <h2>Your monthly information</h2>
+
+  <form method="post">
+    <p>
+      <label>Monthly gross income</label><br>
+      <input name="gross_income" type="number" step="0.01" placeholder="Enter amount">
+    </p>
+
+    <p>
+      <label>Income-tax estimate (%)</label><br>
+      <input name="income_tax_rate" type="number" step="0.01" placeholder="Enter rate">
+    </p>
+
+    <p>
+      <label>Payroll-tax estimate (%)</label><br>
+      <input name="payroll_tax_rate" type="number" step="0.01" placeholder="Enter rate">
+    </p>
+
+    <p>
+      <label>Sales tax / VAT estimate (%)</label><br>
+      <input name="sales_tax_rate" type="number" step="0.01" placeholder="Enter rate">
+    </p>
+
+    <p>
+      <label>Pay schedule</label><br>
+      <select name="pay_schedule">
+        <option value="">Choose a schedule</option>
+        <option value="weekly">Weekly</option>
+        <option value="biweekly">Every two weeks</option>
+        <option value="monthly">Monthly</option>
+      </select>
+    </p>
+
+    <button class="primary-button" type="submit">Save Income Details</button>
+  </form>
+</section>
+
+<section class="panel" style="margin-top: 16px;">
+  <p class="label">EXPENSES</p>
+  <h2>Recurring monthly expenses</h2>
+
+  {% for expense in expenses | default([], true) %}
+  <div class="spending-row">
+    <span>{{ expense.name }}</span>
+    <strong>{{ expense.amount }}</strong>
+  </div>
+  {% else %}
+  <p>No expenses have been saved yet.</p>
+  {% endfor %}
+
+  <form method="post">
+    <p>
+      <label>Expense name</label><br>
+      <input name="expense_name" type="text" placeholder="For example: housing, food, or utilities">
+    </p>
+
+    <p>
+      <label>Expense category</label><br>
+      <select name="expense_category">
+        <option value="">Choose a category</option>
+        <option>Housing</option>
+        <option>Food</option>
+        <option>Utilities</option>
+        <option>Transportation</option>
+        <option>Debt</option>
+        <option>Subscriptions</option>
+        <option>Other</option>
+      </select>
+    </p>
+
+    <p>
+      <label>Monthly amount</label><br>
+      <input name="expense_amount" type="number" step="0.01" placeholder="Enter amount">
+    </p>
+
+    <button class="primary-button" type="submit">Add Expense</button>
+  </form>
+</section>
+{% endblock %}

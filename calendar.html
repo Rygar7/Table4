@@ -1,0 +1,34 @@
+{% extends "base.html" %}
+
+{% block content %}
+<section class="welcome">
+  <div>
+    <p class="label">MONEY CALENDAR</p>
+    <h1>Financial dates</h1>
+    <p>Track paydays, bills, subscriptions, and goal dates.</p>
+  </div>
+
+  <button class="primary-button">Add Date</button>
+</section>
+
+<section class="panel">
+  <p class="label">UPCOMING DATES</p>
+  <h2>Your financial schedule</h2>
+
+  {% for event in events | default([], true) %}
+  <div class="spending-row">
+    <span>{{ event.date }}</span>
+    <strong>{{ event.title }}</strong>
+  </div>
+  {% else %}
+  <p>No financial dates have been added yet.</p>
+  {% endfor %}
+</section>
+
+<section class="panel ai-panel" style="margin-top: 16px;">
+  <p class="label">AI CALENDAR PLANNING</p>
+  <h2>Plan around your real dates.</h2>
+  <p>After Nemotron is connected, it can use your dates to suggest a spending plan before each bill or payday.</p>
+  <a class="light-button" href="/nemotron">Ask AI Coach</a>
+</section>
+{% endblock %}

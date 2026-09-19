@@ -1,0 +1,49 @@
+{% extends "base.html" %}
+
+{% block content %}
+<section class="welcome">
+  <div>
+    <p class="label">NEMOTRON AI COACH</p>
+    <h1>Build your money plan.</h1>
+    <p>Use your saved budget, expenses, goals, and calendar information.</p>
+  </div>
+</section>
+
+<section class="content-grid">
+  <article class="panel">
+    <p class="label">AI CONTEXT</p>
+    <h2>Information available to the coach</h2>
+    <ul>
+      <li>Income and estimated taxes</li>
+      <li>Monthly expenses</li>
+      <li>Goals and progress</li>
+      <li>Bill and payday dates</li>
+    </ul>
+    <p>Do not enter passwords, account numbers, or government ID information.</p>
+  </article>
+
+  <article class="panel ai-panel">
+    <p class="label">COACH RESPONSE</p>
+    <h2>{{ ai_heading | default("Your AI plan will appear here.", true) }}</h2>
+    <p>{{ ai_response | default("Connect the Nemotron API after the budget system is saving user information.", true) }}</p>
+  </article>
+</section>
+
+<section class="panel" style="margin-top: 16px;">
+  <p class="label">ASK NEMOTRON</p>
+  <h2>What would you like help with?</h2>
+
+  <form method="post">
+    <p>
+      <input
+        name="message"
+        type="text"
+        placeholder="Ask about your budget, goals, or upcoming expenses"
+        style="width: 100%; padding: 12px;"
+      >
+    </p>
+
+    <button class="primary-button" type="submit">Send Message</button>
+  </form>
+</section>
+{% endblock %}

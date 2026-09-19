@@ -1,0 +1,64 @@
+{% extends "base.html" %}
+
+{% block content %}
+<section class="welcome">
+  <div>
+    <p class="label">MONTHLY OVERVIEW</p>
+    <h1>Make your next dollar count.</h1>
+    <p>Your income, spending, goals, and plan—together.</p>
+  </div>
+
+  <a class="primary-button" href="/money">Update Budget</a>
+</section>
+
+<section class="money-cards">
+  <article class="card">
+    <p>Available This Month</p>
+    <h2>{{ available_this_month | default("—", true) }}</h2>
+    <span>After income, taxes, and expenses</span>
+  </article>
+
+  <article class="card">
+    <p>Monthly Income</p>
+    <h2>{{ monthly_income | default("—", true) }}</h2>
+    <span>Your estimated income</span>
+  </article>
+
+  <article class="card">
+    <p>Monthly Expenses</p>
+    <h2>{{ monthly_expenses | default("—", true) }}</h2>
+    <span>Your saved expense total</span>
+  </article>
+
+  <article class="card">
+    <p>Primary Goal Progress</p>
+    <h2>{{ primary_goal_progress | default("—", true) }}</h2>
+    <span>{{ primary_goal_name | default("No goal added yet", true) }}</span>
+  </article>
+</section>
+
+<section class="content-grid">
+  <article class="panel">
+    <p class="label">SPENDING</p>
+    <h2>Where your money goes</h2>
+
+    {% for expense in expenses | default([], true) %}
+    <div class="spending-row">
+      <span>{{ expense.name }}</span>
+      <div class="progress"><div style="width: {{ expense.percent }}%"></div></div>
+      <strong>{{ expense.amount }}</strong>
+    </div>
+    {% else %}
+    <p>No expenses have been added yet.</p>
+    <a class="light-button" href="/money">Add Expenses</a>
+    {% endfor %}
+  </article>
+
+  <article class="panel ai-panel">
+    <p class="label">NEMOTRON AI COACH</p>
+    <h2>{{ ai_heading | default("Your personalized plan will appear here.", true) }}</h2>
+    <p>{{ ai_summary | default("Add your budget and goals, then connect Nemotron to receive guidance.", true) }}</p>
+    <a class="light-button" href="/nemotron">Open AI Coach</a>
+  </article>
+</section>
+{% endblock %}

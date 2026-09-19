@@ -6,7 +6,17 @@
   <title>LifePath AI</title>
   <link rel="stylesheet" href="{{ url_for('static', path='style.css') }}">
 </head>
-<body>
+{% set page_theme = {
+  '/': 'home',
+  '/money': 'money',
+  '/calendar': 'calendar',
+  '/goals': 'goals',
+  '/accounts': 'accounts',
+  '/stocks': 'stocks',
+  '/ideas': 'ideas',
+  '/nemotron': 'ai'
+}.get(request.url.path, 'home') %}
+<body class="theme-{{ page_theme }}">
   <header>
     <div class="logo">LifePath AI</div>
 

@@ -95,6 +95,11 @@ def accounts_page(request: Request):
     return templates.TemplateResponse(request=request, name="accounts.html")
 
 
+@app.get("/subscriptions", include_in_schema=False)
+def subscriptions_page(request: Request):
+    return templates.TemplateResponse(request=request, name="subscriptions.html")
+
+
 @app.get("/nemotron", include_in_schema=False)
 def nemotron_page(request: Request):
     return templates.TemplateResponse(request=request, name="nemotron.html")

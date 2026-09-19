@@ -15,6 +15,12 @@ def test_health() -> None:
     assert response.json() == {"status": "healthy"}
 
 
+def test_subscriptions_page() -> None:
+    response = client.get("/subscriptions")
+    assert response.status_code == 200
+    assert "SUBSCRIPTION TRACKER" in response.text
+
+
 def test_model_json_parser_ignores_trailing_text() -> None:
     assert _extract_json('{"status": "ok"}\nextra') == {"status": "ok"}
 

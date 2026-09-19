@@ -34,6 +34,7 @@ Open `http://127.0.0.1:8000/docs` for the interactive API documentation.
 Open `http://127.0.0.1:8000/stocks` to use the connected stock lookup page.
 Open `http://127.0.0.1:8000/ideas` for the simplified Suggested Trades experience.
 Open `http://127.0.0.1:8000/accounts` to add bank balances, credit cards, and loans.
+Open `http://127.0.0.1:8000/subscriptions` to total recurring costs and track renewal warnings.
 The bank connection is clearly marked demo-only; production bank linking requires a
 user-authorized provider such as Plaid Link.
 The Money and Goals pages save prototype data in the browser, and the AI Coach page sends

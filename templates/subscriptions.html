@@ -1,0 +1,178 @@
+{% extends "base.html" %}
+
+{% block content %}
+<div class="subscriptions-shell">
+  <section class="welcome compact-welcome">
+    <div>
+      <p class="label">SUBSCRIPTION TRACKER</p>
+      <h1>Know what renews.<br><span class="subscription-gradient">Before it charges.</span></h1>
+      <p>Add your recurring bills once. Life Path AI converts them into one monthly cost and keeps upcoming renewals easy to see.</p>
+    </div>
+    <a class="primary-button" href="#subscription-form">Add Subscription</a>
+  </section>
+
+  <section class="subscription-overview">
+    <article class="renewal-visual panel">
+      <div id="cost-ring" class="cost-ring" style="--ring-fill: 0deg">
+        <div><strong id="ring-total">$0</strong><span>per month</span></div>
+      </div>
+      <div>
+        <p class="label">MONTHLY COMMITMENT</p>
+        <h2>Your recurring-cost picture</h2>
+        <p id="overview-message">Add your first subscription to see the total.</p>
+      </div>
+    </article>
+
+    <div class="subscription-stats">
+      <article class="mini-dashboard-card gold-card"><span>Monthly cost</span><strong id="monthly-total">$0.00</strong></article>
+      <article class="mini-dashboard-card purple-card"><span>Yearly cost</span><strong id="yearly-total">$0.00</strong></article>
+      <article class="mini-dashboard-card coral-card"><span>Due in 7 days</span><strong id="due-soon-count">0</strong></article>
+      <article class="mini-dashboard-card blue-card"><span>Subscriptions</span><strong id="subscription-count">0</strong></article>
+    </div>
+  </section>
+
+  <section class="panel subscription-form-panel">
+    <div class="section-heading">
+      <div>
+        <p class="step-number">+</p>
+        <div><h2>Add a subscription</h2><p>No account login or card number needed.</p></div>
+      </div>
+    </div>
+    <form id="subscription-form" class="subscription-form">
+      <label>Service name<input id="subscription-name" maxlength="80" placeholder="Netflix" required></label>
+      <label>Cost<input id="subscription-cost" type="number" min="0.01" step="0.01" placeholder="15.49" required></label>
+      <label>How often?<select id="subscription-frequency" required><option value="monthly">Monthly</option><option value="weekly">Weekly</option><option value="quarterly">Every 3 months</option><option value="yearly">Yearly</option></select></label>
+      <label>Next renewal<input id="subscription-renewal" type="date" required></label>
+      <label>Category<select id="subscription-category"><option>Entertainment</option><option>Software</option><option>Fitness</option><option>News</option><option>Utilities</option><option>Other</option></select></label>
+      <button class="primary-button" type="submit">Save Subscription</button>
+    </form>
+    <p id="subscription-status" class="plain-note">Saved only in this browser.</p>
+  </section>
+
+  <section class="subscription-content-grid">
+    <article class="panel">
+      <p class="label">RENEWAL ALERTS</p>
+      <h2>What is charging next?</h2>
+      <div id="renewal-list" class="renewal-list"></div>
+    </article>
+    <article class="panel category-panel">
+      <p class="label">MONTHLY BREAKDOWN</p>
+      <h2>Cost by category</h2>
+      <div id="category-bars" class="category-bars"></div>
+    </article>
+  </section>
+</div>
+
+<script>
+  const SUBSCRIPTION_KEY = "lifepath_subscriptions_v1";
+  let subscriptions = loadSubscriptions();
+  const frequencyLabels = { weekly: "week", monthly: "month", quarterly: "3 months", yearly: "year" };
+  const categoryColors = { Entertainment: "#ff6f91", Software: "#a987ff", Fitness: "#41e6d3", News: "#63a8ff", Utilities: "#ffb65c", Other: "#9aafa0" };
+
+  function loadSubscriptions() {
+    try { return JSON.parse(localStorage.getItem(SUBSCRIPTION_KEY) || "[]"); }
+    catch { return []; }
+  }
+
+  function monthlyCost(item) {
+    const cost = Number(item.cost);
+    return item.frequency === "weekly" ? cost * 52 / 12 : item.frequency === "quarterly" ? cost / 3 : item.frequency === "yearly" ? cost / 12 : cost;
+  }
+
+  function localDate(value) { return new Date(`${value}T12:00:00`); }
+  function today() { const now = new Date(); return new Date(now.getFullYear(), now.getMonth(), now.getDate(), 12); }
+  function daysUntil(value) { return Math.ceil((localDate(value) - today()) / 86400000); }
+  function money(value) { return new Intl.NumberFormat("en-US", { style: "currency", currency: "USD" }).format(value); }
+  function readableDate(value) { return localDate(value).toLocaleDateString("en-US", { month: "short", day: "numeric", year: "numeric" }); }
+
+  function renewalState(days) {
+    if (days < 0) return { className: "overdue", label: `${Math.abs(days)} day${Math.abs(days) === 1 ? "" : "s"} overdue` };
+    if (days === 0) return { className: "urgent", label: "Renews today" };
+    if (days <= 7) return { className: "urgent", label: `Renews in ${days} day${days === 1 ? "" : "s"}` };
+    if (days <= 30) return { className: "soon", label: `Renews in ${days} days` };
+    return { className: "safe", label: `Renews in ${days} days` };
+  }
+
+  function save() {
+    localStorage.setItem(SUBSCRIPTION_KEY, JSON.stringify(subscriptions));
+    render();
+  }
+
+  function advanceRenewal(item) {
+    let next = localDate(item.renewal);
+    if (next < today()) next = today();
+    if (item.frequency === "weekly") next.setDate(next.getDate() + 7);
+    else if (item.frequency === "monthly") next.setMonth(next.getMonth() + 1);
+    else if (item.frequency === "quarterly") next.setMonth(next.getMonth() + 3);
+    else next.setFullYear(next.getFullYear() + 1);
+    item.renewal = `${next.getFullYear()}-${String(next.getMonth() + 1).padStart(2, "0")}-${String(next.getDate()).padStart(2, "0")}`;
+    save();
+  }
+
+  function renderRenewals() {
+    const list = document.getElementById("renewal-list");
+    if (!subscriptions.length) {
+      const empty = document.createElement("div"); empty.className = "empty-renewals"; empty.textContent = "No renewals yet. Add a subscription above."; list.replaceChildren(empty); return;
+    }
+    const sorted = [...subscriptions].sort((a, b) => localDate(a.renewal) - localDate(b.renewal));
+    list.replaceChildren(...sorted.map(item => {
+      const row = document.createElement("div"); row.className = "renewal-row";
+      const days = daysUntil(item.renewal); const state = renewalState(days);
+      const icon = document.createElement("span"); icon.className = "service-icon"; icon.style.background = categoryColors[item.category] || categoryColors.Other; icon.textContent = item.name.slice(0, 1).toUpperCase();
+      const info = document.createElement("div"); info.className = "renewal-info";
+      const title = document.createElement("strong"); title.textContent = item.name;
+      const detail = document.createElement("span"); detail.textContent = `${money(item.cost)} / ${frequencyLabels[item.frequency]} · ${readableDate(item.renewal)}`;
+      info.append(title, detail);
+      const badge = document.createElement("span"); badge.className = `renewal-badge ${state.className}`; badge.textContent = state.label;
+      const actions = document.createElement("div"); actions.className = "renewal-actions";
+      const renewed = document.createElement("button"); renewed.type = "button"; renewed.textContent = "Mark renewed"; renewed.addEventListener("click", () => advanceRenewal(item));
+      const remove = document.createElement("button"); remove.type = "button"; remove.textContent = "Remove"; remove.addEventListener("click", () => { subscriptions = subscriptions.filter(entry => entry.id !== item.id); save(); });
+      actions.append(renewed, remove); row.append(icon, info, badge, actions); return row;
+    }));
+  }
+
+  function renderCategories(monthlyTotal) {
+    const totals = {};
+    subscriptions.forEach(item => totals[item.category] = (totals[item.category] || 0) + monthlyCost(item));
+    const container = document.getElementById("category-bars");
+    if (!subscriptions.length) { container.textContent = "Your category graph will appear here."; return; }
+    container.replaceChildren(...Object.entries(totals).sort((a, b) => b[1] - a[1]).map(([category, total]) => {
+      const row = document.createElement("div"); row.className = "category-row";
+      const heading = document.createElement("div"); const name = document.createElement("span"); name.textContent = category; const amount = document.createElement("strong"); amount.textContent = money(total); heading.append(name, amount);
+      const track = document.createElement("div"); track.className = "category-track"; const fill = document.createElement("i"); fill.style.width = `${monthlyTotal ? total / monthlyTotal * 100 : 0}%`; fill.style.background = categoryColors[category] || categoryColors.Other; track.appendChild(fill);
+      row.append(heading, track); return row;
+    }));
+  }
+
+  function render() {
+    const monthly = subscriptions.reduce((total, item) => total + monthlyCost(item), 0);
+    const dueSoon = subscriptions.filter(item => daysUntil(item.renewal) <= 7).length;
+    document.getElementById("monthly-total").textContent = money(monthly);
+    document.getElementById("yearly-total").textContent = money(monthly * 12);
+    document.getElementById("due-soon-count").textContent = dueSoon;
+    document.getElementById("subscription-count").textContent = subscriptions.length;
+    document.getElementById("ring-total").textContent = money(monthly);
+    document.getElementById("cost-ring").style.setProperty("--ring-fill", `${Math.min(monthly / 250, 1) * 360}deg`);
+    document.getElementById("overview-message").textContent = subscriptions.length ? `${subscriptions.length} recurring payment${subscriptions.length === 1 ? "" : "s"} equal about ${money(monthly)} each month.` : "Add your first subscription to see the total.";
+    renderRenewals(); renderCategories(monthly);
+  }
+
+  const renewalInput = document.getElementById("subscription-renewal");
+  renewalInput.min = new Date().toISOString().slice(0, 10);
+  document.getElementById("subscription-form").addEventListener("submit", event => {
+    event.preventDefault();
+    subscriptions.push({
+      id: crypto.randomUUID ? crypto.randomUUID() : `${Date.now()}-${Math.random()}`,
+      name: document.getElementById("subscription-name").value.trim(),
+      cost: Number(document.getElementById("subscription-cost").value),
+      frequency: document.getElementById("subscription-frequency").value,
+      renewal: renewalInput.value,
+      category: document.getElementById("subscription-category").value,
+    });
+    save(); event.currentTarget.reset(); renewalInput.min = new Date().toISOString().slice(0, 10);
+    document.getElementById("subscription-status").textContent = "Subscription saved. Your totals and renewal alerts are updated.";
+  });
+
+  render();
+</script>
+{% endblock %}

@@ -862,6 +862,11 @@ details a {
   --theme-rgb: 255, 182, 92; --secondary-rgb: 255, 111, 145; --theme-midnight: #221306;
   --line: rgba(255, 182, 92, 0.22); --line-bright: rgba(255, 182, 92, 0.52);
 }
+.theme-subscriptions {
+  --green: #ffd166; --green-light: #ffecb0; --green-deep: #a66e00;
+  --theme-rgb: 255, 209, 102; --secondary-rgb: 255, 111, 145; --theme-midnight: #211706;
+  --line: rgba(255, 209, 102, 0.22); --line-bright: rgba(255, 209, 102, 0.52);
+}
 .theme-stocks {
   --green: #31dfb6; --green-light: #b4ffec; --green-deep: #07876c;
   --theme-rgb: 49, 223, 182; --secondary-rgb: 65, 230, 211; --theme-midnight: #041915;
@@ -882,9 +887,10 @@ nav a:nth-child(1) { --tab-color: #41e6d3; }
 nav a:nth-child(2) { --tab-color: #63a8ff; }
 nav a:nth-child(3) { --tab-color: #a987ff; }
 nav a:nth-child(4) { --tab-color: #ffb65c; }
-nav a:nth-child(5) { --tab-color: #31dfb6; }
-nav a:nth-child(6) { --tab-color: #ff6f91; }
-nav a:nth-child(7) { --tab-color: #d182ff; }
+nav a:nth-child(5) { --tab-color: #ffd166; }
+nav a:nth-child(6) { --tab-color: #31dfb6; }
+nav a:nth-child(7) { --tab-color: #ff6f91; }
+nav a:nth-child(8) { --tab-color: #d182ff; }
 
 body::before,
 body::after {
@@ -1024,4 +1030,105 @@ main::before {
   .quick-symbols { overflow-x: auto; }
   .quote-sidebar { grid-template-columns: 1fr; }
   .mini-stat-grid { grid-column: auto; }
+}
+
+/* Subscription tracker */
+.subscriptions-shell { max-width: 1040px; margin: 0 auto; }
+.subscription-gradient {
+  color: transparent;
+  background: linear-gradient(90deg, #ffd166, #ffb65c 50%, #ff6f91);
+  background-clip: text;
+  -webkit-background-clip: text;
+}
+.subscription-overview { display: grid; grid-template-columns: 1.4fr 1fr; gap: 16px; margin-bottom: 16px; }
+.renewal-visual { display: flex; align-items: center; gap: 28px; min-height: 230px; }
+.renewal-visual > div:last-child { max-width: 330px; }
+.renewal-visual p:not(.label) { color: var(--muted); }
+.cost-ring {
+  position: relative;
+  display: grid;
+  flex: 0 0 158px;
+  place-items: center;
+  width: 158px;
+  height: 158px;
+  background: conic-gradient(#ffd166 0 var(--ring-fill), rgba(255, 209, 102, 0.12) var(--ring-fill) 360deg);
+  border-radius: 50%;
+  box-shadow: 0 0 34px rgba(255, 209, 102, 0.16);
+}
+.cost-ring::before { position: absolute; width: 118px; height: 118px; background: #0a1510; border-radius: 50%; content: ""; }
+.cost-ring div { position: relative; z-index: 1; max-width: 105px; text-align: center; }
+.cost-ring strong, .cost-ring span { display: block; }
+.cost-ring strong { overflow: hidden; color: #ffd166; font-size: 22px; text-overflow: ellipsis; }
+.cost-ring span { margin-top: 3px; color: var(--muted); font-size: 11px; }
+.subscription-stats { display: grid; grid-template-columns: 1fr 1fr; gap: 12px; }
+.mini-dashboard-card {
+  display: flex;
+  min-height: 108px;
+  padding: 18px;
+  flex-direction: column;
+  justify-content: space-between;
+  background: rgba(8, 20, 15, 0.86);
+  border: 1px solid var(--line);
+  border-radius: 16px;
+}
+.mini-dashboard-card span { color: var(--muted); font-size: 12px; }
+.mini-dashboard-card strong { font-size: 22px; }
+.gold-card { border-top: 3px solid #ffd166; } .gold-card strong { color: #ffd166; }
+.purple-card { border-top: 3px solid #a987ff; } .purple-card strong { color: #a987ff; }
+.coral-card { border-top: 3px solid #ff6f91; } .coral-card strong { color: #ff6f91; }
+.blue-card { border-top: 3px solid #63a8ff; } .blue-card strong { color: #63a8ff; }
+.subscription-form-panel { margin-bottom: 16px; }
+.subscription-form {
+  display: grid;
+  max-width: none;
+  margin-top: 20px;
+  grid-template-columns: 1.3fr .8fr 1fr 1fr 1fr auto;
+  align-items: end;
+  gap: 11px;
+}
+.subscription-form .primary-button { min-height: 43px; white-space: nowrap; }
+.subscription-content-grid { display: grid; grid-template-columns: 1.3fr .7fr; gap: 16px; }
+.renewal-list { margin-top: 18px; }
+.empty-renewals { padding: 30px 16px; color: var(--muted); text-align: center; border: 1px dashed var(--line); border-radius: 12px; }
+.renewal-row {
+  display: grid;
+  grid-template-columns: 42px minmax(130px, 1fr) auto auto;
+  align-items: center;
+  gap: 12px;
+  padding: 14px 0;
+  border-bottom: 1px solid rgba(var(--theme-rgb), 0.11);
+}
+.service-icon { display: grid; place-items: center; width: 38px; height: 38px; color: #07100b; font-weight: 700; border-radius: 11px; }
+.renewal-info strong, .renewal-info span { display: block; }
+.renewal-info span { margin-top: 4px; color: var(--muted); font-size: 11px; }
+.renewal-badge { padding: 6px 9px; font-size: 10px; border-radius: 99px; white-space: nowrap; }
+.renewal-badge.safe { color: #41e6d3; background: rgba(65, 230, 211, 0.1); }
+.renewal-badge.soon { color: #ffd166; background: rgba(255, 209, 102, 0.1); }
+.renewal-badge.urgent, .renewal-badge.overdue { color: #ff9cb3; background: rgba(255, 111, 145, 0.13); border: 1px solid rgba(255, 111, 145, 0.25); }
+.renewal-actions { display: flex; flex-direction: column; gap: 5px; }
+.renewal-actions button { padding: 4px; color: var(--muted); font-family: inherit; font-size: 10px; background: transparent; border: 0; cursor: pointer; }
+.renewal-actions button:first-child { color: var(--green); }
+.category-bars { margin-top: 22px; color: var(--muted); }
+.category-row { margin-bottom: 18px; }
+.category-row > div:first-child { display: flex; justify-content: space-between; gap: 10px; margin-bottom: 7px; font-size: 12px; }
+.category-row strong { color: var(--text); }
+.category-track { height: 9px; overflow: hidden; background: rgba(255, 255, 255, 0.06); border-radius: 99px; }
+.category-track i { display: block; height: 100%; border-radius: inherit; box-shadow: 0 0 12px currentColor; }
+
+@media (max-width: 950px) {
+  .subscription-form { grid-template-columns: repeat(3, 1fr); }
+}
+
+@media (max-width: 760px) {
+  .subscription-overview, .subscription-content-grid { grid-template-columns: 1fr; }
+  .renewal-visual { align-items: flex-start; flex-direction: column; }
+  .subscription-form { grid-template-columns: 1fr 1fr; }
+  .renewal-row { grid-template-columns: 42px 1fr; }
+  .renewal-badge, .renewal-actions { grid-column: 2; }
+  .renewal-actions { flex-direction: row; }
+}
+
+@media (max-width: 500px) {
+  .subscription-form, .subscription-stats { grid-template-columns: 1fr; }
+  .renewal-visual { align-items: center; text-align: center; }
 }

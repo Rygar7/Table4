@@ -171,3 +171,38 @@ class StockInsight(BaseModel):
     generated_by: str
     source: str
     source_url: str
+
+
+class MarketTrend(BaseModel):
+    symbol: str
+    label: str
+    period_return_percent: float | None
+    direction: str
+
+
+class MarketNewsItem(BaseModel):
+    headline: str
+    summary: str
+    source: str
+    url: str
+    created_at: str
+    symbols: list[str]
+
+
+class PortfolioExample(BaseModel):
+    name: str
+    risk_level: str
+    stock_percent: int
+    bond_percent: int
+    description: str
+    source_url: str
+
+
+class MarketResearch(BaseModel):
+    market_summary: str
+    research_ideas: list[str]
+    trends: list[MarketTrend]
+    portfolio_examples: list[PortfolioExample]
+    news: list[MarketNewsItem]
+    generated_by: str
+    disclaimer: str

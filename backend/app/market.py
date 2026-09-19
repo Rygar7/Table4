@@ -163,3 +163,75 @@ def calculate_stock_metrics(quote: dict, history: dict) -> dict:
         "annualized_volatility_percent": volatility,
         "maximum_drawdown_percent": maximum_drawdown,
     }
+
+
+@lru_cache(maxsize=16)
+def _get_market_news_cached(_cache_window: int) -> list[dict]:
+    try:
+        response = httpx.get(
+            "https://data.alpaca.markets/v1beta1/news",
+            params={
+                "symbols": "SPY,QQQ,IWM,VTI,VXUS,BND",
+                "limit": 8,
+                "sort": "desc",
+                "include_content": "false",
+            },
+            headers=_headers(),
+            timeout=15,
+        )
+        response.raise_for_status()
+    except httpx.HTTPError as exc:
+        raise MarketDataError("Current market news is temporarily unavailable.") from exc
+    return [
+        {
+            "headline": item.get("headline", "Untitled article"),
+            "summary": item.get("summary", ""),
+            "source": item.get("source", "Alpaca News"),
+            "url": item.get("url", ""),
+            "created_at": item.get("created_at", ""),
+            "symbols": item.get("symbols", []),
+        }
+        for item in response.json().get("news", [])
+        if item.get("url")
+    ]
+
+
+def get_market_news() -> list[dict]:
+    return _get_market_news_cached(int(time.time() // 300))
+
+
+def get_market_trends() -> list[dict]:
+    instruments = {
+        "SPY": "Large U.S. companies",
+        "QQQ": "Nasdaq-100 growth companies",
+        "IWM": "Smaller U.S. companies",
+        "VXUS": "International stocks",
+        "BND": "U.S. investment-grade bonds",
+    }
+    trends = []
+    for symbol, label in instruments.items():
+        closes = [
+            float(bar["close"])
+            for bar in get_stock_history(symbol, 30)["bars"]
+            if bar.get("close")
+        ]
+        period_return = None
+        if len(closes) >= 2 and closes[0]:
+            period_return = round((closes[-1] / closes[0] - 1) * 100, 2)
+        if period_return is None:
+            direction = "insufficient_data"
+        elif period_return > 1:
+            direction = "up"
+        elif period_return < -1:
+            direction = "down"
+        else:
+            direction = "flat"
+        trends.append(
+            {
+                "symbol": symbol,
+                "label": label,
+                "period_return_percent": period_return,
+                "direction": direction,
+            }
+        )
+    return trends

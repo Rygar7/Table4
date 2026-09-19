@@ -24,6 +24,8 @@ Open `http://127.0.0.1:8000/docs` for the interactive API documentation.
 - `GET /api/v1/stocks/{symbol}` returns the latest Alpaca/IEX stock quote.
 - `GET /api/v1/stocks/{symbol}/history` returns recent daily price history.
 - `GET /api/v1/stocks/{symbol}/insight` calculates recent risk metrics and asks Nemotron to explain them.
+- `GET /api/v1/market/research` combines broad-market trends, current Alpaca news,
+  sourced portfolio examples, and Nemotron-generated research ideas.
 
 Open `http://127.0.0.1:8000/stocks` to use the connected stock lookup page.
 The Money and Goals pages save prototype data in the browser, and the AI Coach page sends

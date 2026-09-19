@@ -54,7 +54,8 @@
         <g id="chart-grid"></g><path id="chart-area"></path><path id="chart-line"></path><g id="chart-points"></g>
         <g id="chart-cursor" hidden>
           <line y1="20" y2="256"></line>
-          <circle class="cursor-halo" r="12"></circle>
+          <circle class="cursor-halo" r="20"></circle>
+          <circle class="cursor-ring" r="11"></circle>
           <circle class="cursor-dot" r="6"></circle>
         </g>
       </svg>
@@ -172,12 +173,12 @@
     document.getElementById("period-high-label").textContent = `${selectedDays === 365 ? "1-year" : `${selectedDays}-day`} high`;
     document.getElementById("period-low-label").textContent = `${selectedDays === 365 ? "1-year" : `${selectedDays}-day`} low`;
     document.getElementById("drag-hint").hidden = false;
-    document.getElementById("chart-cursor").hidden = true;
+    document.getElementById("chart-cursor").setAttribute("hidden", "");
     document.getElementById("chart-tooltip").hidden = true;
   }
 
   function hideChartInspection() {
-    document.getElementById("chart-cursor").hidden = true;
+    document.getElementById("chart-cursor").setAttribute("hidden", "");
     document.getElementById("chart-tooltip").hidden = true;
   }
 
@@ -201,7 +202,7 @@
       point.classList.toggle("up", chartState.isUp);
       point.classList.toggle("down", !chartState.isUp);
     });
-    cursor.hidden = false;
+    cursor.removeAttribute("hidden");
     const tooltip = document.getElementById("chart-tooltip");
     const bar = chartState.bars[index];
     document.getElementById("tooltip-price").textContent = currency(bar.close);

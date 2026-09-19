@@ -1258,12 +1258,13 @@ main::before {
 .range-controls button:hover { color: var(--green-light); }
 .range-controls button.selected { color: #04110f; background: var(--green); box-shadow: 0 0 13px rgba(var(--theme-rgb), .25); }
 #stock-chart { cursor: crosshair; touch-action: none; user-select: none; }
-#chart-cursor line { stroke: rgba(240, 255, 244, .55); stroke-width: 1; stroke-dasharray: 4 5; }
+#chart-cursor line { stroke: rgba(255, 255, 255, .72); stroke-width: 2; stroke-dasharray: 5 5; }
 #chart-cursor[hidden] { display: none; }
-#chart-cursor .cursor-halo { fill: currentColor; opacity: .22; stroke: currentColor; stroke-width: 2; }
-#chart-cursor .cursor-dot { stroke: #06100d; stroke-width: 3; filter: drop-shadow(0 0 8px currentColor); }
 #chart-cursor circle.up { fill: var(--cyan); color: var(--cyan); }
 #chart-cursor circle.down { fill: var(--coral); color: var(--coral); }
+#chart-cursor circle.cursor-halo { fill: currentColor; opacity: .3; stroke: currentColor; stroke-width: 3; }
+#chart-cursor circle.cursor-ring { fill: #06100d; stroke: #fff; stroke-width: 4; filter: drop-shadow(0 0 10px currentColor); }
+#chart-cursor circle.cursor-dot { fill: currentColor; stroke: none; }
 .chart-tooltip {
   position: absolute;
   z-index: 3;

@@ -1,0 +1,46 @@
+{% extends "base.html" %}
+
+{% block content %}
+<section class="welcome">
+  <div>
+    <p class="label">MARKET WATCH</p>
+    <h1>Research before you invest.</h1>
+    <p>Track symbols and research notes once you connect a market-data source.</p>
+  </div>
+
+  <button class="primary-button">Add Symbol</button>
+</section>
+
+<section class="panel">
+  <p class="label">YOUR WATCHLIST</p>
+  <h2>Saved symbols</h2>
+
+  {% for stock in watchlist | default([], true) %}
+  <div class="spending-row">
+    <span>{{ stock.symbol }}</span>
+    <strong>{{ stock.name }}</strong>
+  </div>
+  {% else %}
+  <p>Your watchlist is empty.</p>
+  {% endfor %}
+</section>
+
+<section class="content-grid" style="margin-top: 16px;">
+  <article class="panel">
+    <p class="label">RESEARCH CHECKLIST</p>
+    <h2>Before investing</h2>
+    <ul>
+      <li>Build an emergency fund first.</li>
+      <li>Do not invest money needed for bills.</li>
+      <li>Understand risk and diversification.</li>
+      <li>Research investments from trustworthy sources.</li>
+    </ul>
+  </article>
+
+  <article class="panel ai-panel">
+    <p class="label">IMPORTANT</p>
+    <h2>Research, not predictions.</h2>
+    <p>Future AI summaries should explain provided information without promising returns or giving personalized buy-and-sell instructions.</p>
+  </article>
+</section>
+{% endblock %}

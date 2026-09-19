@@ -1,0 +1,1 @@
+"""LifePath AI backend package."""

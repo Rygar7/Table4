@@ -3,6 +3,8 @@ import re
 import time
 from datetime import datetime, timedelta, timezone
 from functools import lru_cache
+from math import sqrt
+from statistics import stdev
 
 import httpx
 
@@ -130,4 +132,34 @@ def _get_stock_history_cached(normalized: str, days: int, _cache_window: int) ->
         ],
         "market_feed": "IEX",
         "disclaimer": "Historical market data is informational and may be delayed or incomplete.",
+    }
+
+
+def calculate_stock_metrics(quote: dict, history: dict) -> dict:
+    closes = [float(bar["close"]) for bar in history["bars"] if bar.get("close")]
+    returns = [closes[index] / closes[index - 1] - 1 for index in range(1, len(closes))]
+
+    period_return = None
+    if len(closes) >= 2 and closes[0]:
+        period_return = round((closes[-1] / closes[0] - 1) * 100, 2)
+
+    volatility = None
+    if len(returns) >= 2:
+        volatility = round(stdev(returns) * sqrt(252) * 100, 2)
+
+    maximum_drawdown = None
+    if closes:
+        peak = closes[0]
+        worst = 0.0
+        for close in closes:
+            peak = max(peak, close)
+            worst = min(worst, close / peak - 1)
+        maximum_drawdown = round(worst * 100, 2)
+
+    return {
+        "latest_price": quote["price"],
+        "trading_days_analyzed": len(closes),
+        "period_return_percent": period_return,
+        "annualized_volatility_percent": volatility,
+        "maximum_drawdown_percent": maximum_drawdown,
     }

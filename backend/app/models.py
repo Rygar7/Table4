@@ -150,3 +150,24 @@ class StockHistory(BaseModel):
     bars: list[StockBar]
     market_feed: str
     disclaimer: str
+
+
+class StockMetrics(BaseModel):
+    latest_price: float
+    trading_days_analyzed: int
+    period_return_percent: float | None
+    annualized_volatility_percent: float | None
+    maximum_drawdown_percent: float | None
+
+
+class StockInsight(BaseModel):
+    symbol: str
+    risk_level: str
+    summary: str
+    observations: list[str]
+    research_questions: list[str]
+    limitations: str
+    metrics: StockMetrics
+    generated_by: str
+    source: str
+    source_url: str

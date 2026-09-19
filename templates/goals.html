@@ -8,47 +8,90 @@
     <p>Set a purpose for your available money.</p>
   </div>
 
-  <button class="primary-button">Add Goal</button>
+  <a class="primary-button" href="#goal-form">Add Goal</a>
 </section>
 
 <section class="money-cards">
-  {% for goal in goals | default([], true) %}
   <article class="card">
-    <p>{{ goal.name }}</p>
-    <h2>{{ goal.progress }}</h2>
-    <span>{{ goal.description }}</span>
+    <p id="saved-goal-name">No goal yet</p>
+    <h2 id="saved-goal-progress">—</h2>
+    <span id="saved-goal-description">Create a savings goal to begin.</span>
   </article>
-  {% else %}
-  <article class="card">
-    <p>No goals yet</p>
-    <h2>—</h2>
-    <span>Create a savings or payoff goal to begin.</span>
-  </article>
-  {% endfor %}
 </section>
 
 <section class="panel">
   <p class="label">CREATE A GOAL</p>
   <h2>What are you working toward?</h2>
 
-  <form method="post">
+  <form id="goal-form">
     <p>
       <label>Goal name</label><br>
-      <input name="goal_
-      name" type="text" placeholder="Enter your goal">
+      <input name="goal_name" type="text" placeholder="Enter your goal" required>
     </p>
 
     <p>
       <label>Target amount</label><br>
-      <input name="target_amount" type="number" step="0.01" placeholder="Enter amount">
+      <input name="target_amount" type="number" min="1" step="0.01" placeholder="Enter amount" required>
+    </p>
+
+    <p>
+      <label>Amount already saved</label><br>
+      <input name="current_amount" type="number" min="0" step="0.01" value="0" required>
+    </p>
+
+    <p>
+      <label>Planned monthly contribution</label><br>
+      <input name="monthly_contribution" type="number" min="0" step="0.01" value="0" required>
     </p>
 
     <p>
       <label>Target date</label><br>
-      <input name="target_date" type="date">
+      <input name="target_date" type="date" required>
+    </p>
+
+    <p>
+      <label>Risk comfort</label><br>
+      <select name="risk_comfort" required>
+        <option value="cautious">Cautious</option>
+        <option value="balanced" selected>Balanced</option>
+        <option value="growth">Growth</option>
+      </select>
     </p>
 
     <button class="primary-button" type="submit">Save Goal</button>
+    <span id="goal-status" style="margin-left: 10px;"></span>
   </form>
 </section>
+
+<script>
+  const GOAL_KEY = "lifepath_goal";
+  const form = document.getElementById("goal-form");
+
+  function renderGoal(goal) {
+    if (!goal || !goal.goal_name) return;
+    const target = Number(goal.target_amount);
+    const current = Number(goal.current_amount);
+    const progress = target > 0 ? Math.min(100, current / target * 100) : 0;
+    document.getElementById("saved-goal-name").textContent = goal.goal_name;
+    document.getElementById("saved-goal-progress").textContent = `${progress.toFixed(0)}%`;
+    document.getElementById("saved-goal-description").textContent =
+      `$${current.toFixed(2)} of $${target.toFixed(2)} by ${goal.target_date}`;
+  }
+
+  const savedGoal = JSON.parse(localStorage.getItem(GOAL_KEY) || "null");
+  if (savedGoal) {
+    Object.entries(savedGoal).forEach(([name, value]) => {
+      if (form.elements[name]) form.elements[name].value = value;
+    });
+    renderGoal(savedGoal);
+  }
+
+  form.addEventListener("submit", (event) => {
+    event.preventDefault();
+    const goal = Object.fromEntries(new FormData(form).entries());
+    localStorage.setItem(GOAL_KEY, JSON.stringify(goal));
+    renderGoal(goal);
+    document.getElementById("goal-status").textContent = "Saved on this device.";
+  });
+</script>
 {% endblock %}

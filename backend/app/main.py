@@ -7,15 +7,23 @@ from fastapi.staticfiles import StaticFiles
 from fastapi.templating import Jinja2Templates
 
 from .finance import analyze_profile
-from .market import MarketDataError, get_stock_history, get_stock_quote
+from .market import (
+    MarketDataError,
+    calculate_stock_metrics,
+    get_stock_history,
+    get_stock_quote,
+)
 from .models import (
     FinancialAnalysis,
     FinancialProfile,
     PlanResponse,
     StockHistory,
+    StockInsight,
+    StockMetrics,
     StockQuote,
 )
 from .nemotron import create_coach
+from .stock_coach import create_stock_insight
 
 
 load_dotenv(Path(__file__).resolve().parents[2] / ".env")
@@ -104,6 +112,19 @@ def stock_quote(symbol: str) -> StockQuote:
 def stock_history(symbol: str, days: int = 30) -> StockHistory:
     try:
         return StockHistory.model_validate(get_stock_history(symbol, days))
+    except ValueError as exc:
+        raise HTTPException(status_code=400, detail=str(exc)) from exc
+    except MarketDataError as exc:
+        raise HTTPException(status_code=502, detail=str(exc)) from exc
+
+
+@app.get("/api/v1/stocks/{symbol}/insight", response_model=StockInsight)
+def stock_insight(symbol: str) -> StockInsight:
+    try:
+        quote = get_stock_quote(symbol)
+        history = get_stock_history(symbol, 30)
+        metrics = StockMetrics.model_validate(calculate_stock_metrics(quote, history))
+        return create_stock_insight(quote["symbol"], metrics)
     except ValueError as exc:
         raise HTTPException(status_code=400, detail=str(exc)) from exc
     except MarketDataError as exc:

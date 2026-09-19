@@ -212,12 +212,23 @@ class MarketResearch(BaseModel):
 class SuggestionRequest(BaseModel):
     time_horizon: Literal["under_3_years", "3_to_7_years", "over_7_years"]
     risk_comfort: RiskComfort
+    category: Literal[
+        "all",
+        "technology",
+        "financials",
+        "healthcare",
+        "consumer",
+        "energy",
+        "industrials",
+        "funds",
+    ] = "all"
 
 
 class TradeIdea(BaseModel):
     symbol: str
     name: str
     instrument_type: str
+    category: str
     period_return_percent: float | None
     why_it_appeared: str
     main_risk: str

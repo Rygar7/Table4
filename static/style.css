@@ -1132,3 +1132,55 @@ main::before {
   .subscription-form, .subscription-stats { grid-template-columns: 1fr; }
   .renewal-visual { align-items: center; text-align: center; }
 }
+
+/* Categorized stock explorer */
+.ideas-gradient {
+  color: transparent;
+  background: linear-gradient(90deg, #ff6f91, #d182ff 55%, #63a8ff);
+  background-clip: text;
+  -webkit-background-clip: text;
+}
+.category-picker-card {
+  display: grid;
+  grid-template-columns: 42px 1fr;
+  gap: 18px;
+  margin-bottom: 12px;
+  padding: 20px;
+}
+.category-picker-card h2 { margin-top: 4px; }
+.category-help { margin: 0 0 16px; color: var(--muted); font-size: 13px; }
+.stock-category-grid { display: grid; grid-template-columns: repeat(4, 1fr); gap: 10px; }
+.stock-category-grid button {
+  display: flex;
+  min-height: 126px;
+  padding: 14px;
+  color: var(--text);
+  font-family: inherit;
+  text-align: left;
+  flex-direction: column;
+  background: rgba(8, 16, 13, 0.72);
+  border: 1px solid rgba(255, 111, 145, 0.13);
+  border-radius: 13px;
+  cursor: pointer;
+  transition: .2s ease;
+}
+.stock-category-grid button > span { margin-bottom: 14px; color: var(--green); font-size: 22px; }
+.stock-category-grid button strong { margin-bottom: 5px; font-size: 13px; }
+.stock-category-grid button small { color: var(--muted); font-size: 10px; line-height: 1.4; }
+.stock-category-grid button:hover { border-color: var(--green); transform: translateY(-2px); }
+.stock-category-grid button.selected {
+  background: linear-gradient(145deg, rgba(var(--theme-rgb), .2), rgba(8, 16, 13, .8));
+  border-color: var(--green);
+  box-shadow: 0 0 22px rgba(var(--theme-rgb), .13);
+}
+.stock-category-grid button.selected::after { margin-top: auto; color: var(--green); font-size: 9px; content: "SELECTED"; letter-spacing: 1px; }
+
+@media (max-width: 780px) {
+  .stock-category-grid { grid-template-columns: repeat(2, 1fr); }
+}
+
+@media (max-width: 500px) {
+  .category-picker-card { grid-template-columns: 1fr; }
+  .stock-category-grid { grid-template-columns: 1fr 1fr; }
+  .stock-category-grid button { min-height: 112px; }
+}

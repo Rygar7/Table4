@@ -4,14 +4,32 @@
 <div class="simple-shell">
   <section class="welcome compact-welcome">
     <div>
-      <p class="label">BEGINNER MODE</p>
-      <h1>Three ideas to research.</h1>
-      <p>Answer two simple questions. Nemotron checks recent trends and current news, then builds a short practice watchlist.</p>
+      <p class="label">CATEGORY STOCK EXPLORER</p>
+      <h1>Find companies by<br><span class="ideas-gradient">the world they operate in.</span></h1>
+      <p>Choose an industry, then Nemotron compares recent trends and current news to build a three-stock research list.</p>
+    </div>
+  </section>
+
+  <section class="panel category-picker-card">
+    <p class="step-number">1</p>
+    <div>
+      <h2>What type of investment interests you?</h2>
+      <p class="category-help">You can change categories anytime. Start with Diversified Funds if you are new.</p>
+      <div id="stock-categories" class="stock-category-grid">
+        <button type="button" class="selected" data-category="funds"><span>◫</span><strong>Diversified Funds</strong><small>Many investments together</small></button>
+        <button type="button" data-category="technology"><span>⌘</span><strong>Technology</strong><small>Software, chips, and platforms</small></button>
+        <button type="button" data-category="financials"><span>▥</span><strong>Financials</strong><small>Banks and payment networks</small></button>
+        <button type="button" data-category="healthcare"><span>✚</span><strong>Healthcare</strong><small>Medicine and health services</small></button>
+        <button type="button" data-category="consumer"><span>◉</span><strong>Consumer</strong><small>Everyday products and retail</small></button>
+        <button type="button" data-category="energy"><span>ϟ</span><strong>Energy</strong><small>Power, oil, and renewables</small></button>
+        <button type="button" data-category="industrials"><span>⚙</span><strong>Industrials</strong><small>Machines and transportation</small></button>
+        <button type="button" data-category="all"><span>✦</span><strong>Mixed Market</strong><small>A little of everything</small></button>
+      </div>
     </div>
   </section>
 
   <section class="panel step-card">
-    <p class="step-number">1</p>
+    <p class="step-number">2</p>
     <h2>When might you need this money?</h2>
     <select id="time-horizon">
       <option value="under_3_years">Within 3 years</option>
@@ -21,7 +39,7 @@
   </section>
 
   <section class="panel step-card">
-    <p class="step-number">2</p>
+    <p class="step-number">3</p>
     <h2>How would a temporary loss feel?</h2>
     <select id="risk-comfort">
       <option value="cautious">Very uncomfortable</option>
@@ -47,6 +65,13 @@
 </div>
 
 <script>
+  let selectedCategory = "funds";
+  document.querySelectorAll("[data-category]").forEach(button => button.addEventListener("click", () => {
+    document.querySelectorAll("[data-category]").forEach(item => item.classList.remove("selected"));
+    button.classList.add("selected");
+    selectedCategory = button.dataset.category;
+  }));
+
   document.getElementById("build-list").addEventListener("click", async (event) => {
     const button = event.currentTarget;
     const status = document.getElementById("ideas-status");
@@ -59,6 +84,7 @@
         body: JSON.stringify({
           time_horizon: document.getElementById("time-horizon").value,
           risk_comfort: document.getElementById("risk-comfort").value,
+          category: selectedCategory,
         }),
       });
       const data = await response.json();
@@ -77,7 +103,7 @@
         number.textContent = String(index + 1);
         const type = document.createElement("span");
         type.className = "simple-badge";
-        type.textContent = idea.instrument_type;
+        type.textContent = idea.category;
         top.append(number, type);
 
         const title = document.createElement("h2");

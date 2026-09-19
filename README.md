@@ -27,7 +27,7 @@ Open `http://127.0.0.1:8000/docs` for the interactive API documentation.
 - `GET /api/v1/market/research` combines broad-market trends, current Alpaca news,
   sourced portfolio examples, and Nemotron-generated research ideas.
 - `POST /api/v1/market/suggestions` returns a three-item beginner research shortlist
-  based on time horizon, risk comfort, verified trends, and current sourced news.
+  by market category, based on time horizon, risk comfort, verified trends, and current sourced news.
 - `POST /api/v1/credit/advice` calculates card utilization and debt totals, then asks
   Nemotron to rank three educational credit-improvement priorities.
 

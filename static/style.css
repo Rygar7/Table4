@@ -1218,3 +1218,25 @@ main::before {
 @media (max-width: 700px) {
   .goal-grid { grid-template-columns: 1fr; }
 }
+
+/* Transparent inputs used by the AI savings plan */
+.plan-input-summary {
+  display: grid;
+  margin: 20px 0;
+  grid-template-columns: repeat(4, 1fr);
+  gap: 10px;
+}
+.plan-input-summary[hidden] { display: none; }
+.plan-input-summary > div {
+  padding: 14px;
+  background: rgba(var(--theme-rgb), .07);
+  border: 1px solid rgba(var(--theme-rgb), .16);
+  border-radius: 12px;
+}
+.plan-input-summary span, .plan-input-summary strong { display: block; }
+.plan-input-summary span { margin-bottom: 7px; color: var(--muted); font-size: 10px; }
+.plan-input-summary strong { color: var(--green-light); font-size: 17px; }
+
+@media (max-width: 760px) {
+  .plan-input-summary { grid-template-columns: 1fr 1fr; }
+}

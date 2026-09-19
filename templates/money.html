@@ -5,58 +5,76 @@
   <div>
     <p class="label">YOUR FINANCIAL DETAILS</p>
     <h1>My Money</h1>
-    <p>Add the information the simulator needs.</p>
+    <p>Start with one normal month. You can change these numbers whenever your situation changes.</p>
   </div>
 </section>
 
-<section class="panel">
-  <p class="label">INCOME AND TAXES</p>
-  <h2>Your monthly information</h2>
+<section class="panel friendly-form-panel">
+  <div class="friendly-section-heading">
+    <div><p class="label">STEP 1 · INCOME</p><h2>What comes in each month?</h2><p>Use income before taxes. We will estimate take-home pay separately.</p></div>
+    <span class="privacy-badge">Saved on this device</span>
+  </div>
 
-  <form id="income-form">
-    <p>
-      <label>Monthly gross income</label><br>
-      <input name="gross_income" type="number" min="0" step="0.01" placeholder="Enter amount" required>
-    </p>
+  <form id="income-form" class="friendly-form-grid">
+    <label class="friendly-field featured-field">
+      <span>Income before taxes each month</span>
+      <small id="gross-income-help">Enter one month—not your yearly salary. Example: 5,000.</small>
+      <input name="gross_income" type="number" min="1" step="0.01" placeholder="5,000" aria-describedby="gross-income-help" required>
+    </label>
 
-    <p>
-      <label>Income-tax estimate (%)</label><br>
-      <input name="income_tax_rate" type="number" min="0" max="100" step="0.01" placeholder="Enter rate" value="0">
-    </p>
+    <label class="friendly-field">
+      <span>Estimated income tax</span>
+      <small>Use a rough percentage if you do not know the exact number.</small>
+      <div class="input-suffix"><input name="income_tax_rate" type="number" min="0" max="100" step="0.01" placeholder="12" value="0"><b>%</b></div>
+    </label>
 
-    <p>
-      <label>Payroll-tax estimate (%)</label><br>
-      <input name="payroll_tax_rate" type="number" min="0" max="100" step="0.01" placeholder="Enter rate" value="0">
-    </p>
+    <label class="friendly-field">
+      <span>Estimated payroll tax</span>
+      <small>For example, Social Security and Medicare in the U.S.</small>
+      <div class="input-suffix"><input name="payroll_tax_rate" type="number" min="0" max="100" step="0.01" placeholder="7.65" value="0"><b>%</b></div>
+    </label>
 
-    <p>
-      <label>Sales tax / VAT estimate (%)</label><br>
-      <input name="sales_tax_rate" type="number" min="0" max="100" step="0.01" placeholder="Enter rate" value="0">
-    </p>
+    <label class="friendly-field">
+      <span>Sales tax / VAT estimate</span>
+      <small>Used as planning context; it is not deducted from your paycheck.</small>
+      <div class="input-suffix"><input name="sales_tax_rate" type="number" min="0" max="100" step="0.01" placeholder="6" value="0"><b>%</b></div>
+    </label>
 
-    <p>
-      <label>Pay schedule</label><br>
-      <select name="pay_schedule">
+    <label class="friendly-field">
+      <span>How often are you paid?</span>
+      <small>This places estimated paychecks on your calendar.</small>
+      <select name="pay_schedule" required>
         <option value="">Choose a schedule</option>
         <option value="weekly">Weekly</option>
         <option value="biweekly">Every two weeks</option>
         <option value="monthly">Monthly</option>
       </select>
-    </p>
+    </label>
 
-    <p>
-      <label>Emergency savings</label><br>
+    <label class="friendly-field">
+      <span>Emergency savings already set aside</span>
+      <small>Money reserved for unexpected essential costs.</small>
       <input name="emergency_savings" type="number" min="0" step="0.01" placeholder="Current savings" value="0">
-    </p>
+    </label>
 
-    <button class="primary-button" type="submit">Save Income Details</button>
-    <span id="income-status" style="margin-left: 10px;"></span>
+    <div id="income-preview" class="income-preview" aria-live="polite">
+      <p class="label">INSTANT CHECK</p>
+      <div><span>Yearly equivalent</span><strong id="annual-income-preview">—</strong></div>
+      <div><span>Estimated monthly take-home</span><strong id="take-home-preview">—</strong></div>
+      <p id="income-warning">Enter your monthly income to see a quick check.</p>
+    </div>
+
+    <div class="friendly-form-actions">
+      <button class="primary-button" type="submit">Save Income Details</button>
+      <span id="income-status" role="status"></span>
+    </div>
   </form>
 </section>
 
 <section class="panel" style="margin-top: 16px;">
-  <p class="label">EXPENSES</p>
-  <h2>Recurring monthly expenses</h2>
+  <p class="label">STEP 2 · EXPENSES</p>
+  <h2>What goes out each month?</h2>
+  <p class="form-explainer">Add predictable costs one at a time. The due day is optional, but it makes the calendar more accurate.</p>
 
   <div id="expense-list"><p>No expenses have been saved yet.</p></div>
 
@@ -88,6 +106,7 @@
     <p>
       <label>Usually due on</label><br>
       <input name="expense_due_day" type="number" min="1" max="28" step="1" placeholder="Day of month (optional)">
+      <small class="field-help">Use 1–28 so the date works in every month.</small>
     </p>
 
     <button class="primary-button" type="submit">Add Expense</button>
@@ -100,6 +119,24 @@
   const incomeForm = document.getElementById("income-form");
   const expenseForm = document.getElementById("expense-form");
   const expenseList = document.getElementById("expense-list");
+
+  function formatMoney(value) {
+    return new Intl.NumberFormat("en-US", { style: "currency", currency: "USD", maximumFractionDigits: 0 }).format(value);
+  }
+
+  function updateIncomePreview() {
+    const gross = Number(incomeForm.elements.gross_income.value || 0);
+    const incomeTax = Number(incomeForm.elements.income_tax_rate.value || 0);
+    const payrollTax = Number(incomeForm.elements.payroll_tax_rate.value || 0);
+    const totalTax = Math.min(95, Math.max(0, incomeTax + payrollTax));
+    document.getElementById("annual-income-preview").textContent = gross ? formatMoney(gross * 12) : "—";
+    document.getElementById("take-home-preview").textContent = gross ? formatMoney(gross * (1 - totalTax / 100)) : "—";
+    const warning = document.getElementById("income-warning");
+    if (!gross) warning.textContent = "Enter your monthly income to see a quick check.";
+    else if (gross > 50000) warning.textContent = `That equals ${formatMoney(gross * 12)} per year. Double-check that you did not enter an annual salary.`;
+    else warning.textContent = "Looks reasonable for a monthly entry. This is still only an estimate.";
+    warning.className = gross > 50000 ? "input-warning" : "";
+  }
 
   function renderExpenses() {
     expenseList.replaceChildren();
@@ -135,12 +172,14 @@
   Object.entries(money.income || {}).forEach(([name, value]) => {
     if (incomeForm.elements[name]) incomeForm.elements[name].value = value;
   });
+  incomeForm.addEventListener("input", updateIncomePreview);
 
   incomeForm.addEventListener("submit", (event) => {
     event.preventDefault();
     money.income = Object.fromEntries(new FormData(incomeForm).entries());
     localStorage.setItem(MONEY_KEY, JSON.stringify(money));
-    document.getElementById("income-status").textContent = "Saved on this device.";
+    document.getElementById("income-status").textContent = "Saved. Your dashboard and calendar are updated.";
+    document.getElementById("income-status").className = "save-success";
   });
 
   expenseForm.addEventListener("submit", (event) => {
@@ -159,5 +198,6 @@
   });
 
   renderExpenses();
+  updateIncomePreview();
 </script>
 {% endblock %}

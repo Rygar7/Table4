@@ -21,29 +21,49 @@
   </div>
 </section>
 
+<section class="panel setup-guide" aria-labelledby="setup-title">
+  <div class="setup-guide-heading">
+    <div>
+      <p class="label">QUICK START</p>
+      <h2 id="setup-title">Finish your financial setup</h2>
+      <p id="setup-message">Complete these steps in order. LifePath AI will tell you what to do next.</p>
+    </div>
+    <strong id="setup-count" class="setup-count">0 of 5</strong>
+  </div>
+  <div class="setup-progress" aria-label="Setup progress"><i id="setup-progress-fill"></i></div>
+  <div class="setup-steps">
+    <a class="setup-step" data-setup-step="income" href="/money"><span class="setup-step-number">1</span><span><strong>Add income</strong><small>Monthly pay and tax estimate</small></span><i>Start</i></a>
+    <a class="setup-step" data-setup-step="expenses" href="/money"><span class="setup-step-number">2</span><span><strong>Add expenses</strong><small>Housing, food, bills, and more</small></span><i>Next</i></a>
+    <a class="setup-step" data-setup-step="goal" href="/goals"><span class="setup-step-number">3</span><span><strong>Choose a goal</strong><small>Give your savings a purpose</small></span><i>Next</i></a>
+    <a class="setup-step" data-setup-step="payday" href="/calendar"><span class="setup-step-number">4</span><span><strong>Set your payday</strong><small>Place income on the calendar</small></span><i>Next</i></a>
+    <a class="setup-step" data-setup-step="plan" href="/nemotron"><span class="setup-step-number">5</span><span><strong>Generate your plan</strong><small>Let Nemotron rank your next steps</small></span><i>Finish</i></a>
+  </div>
+  <a id="setup-next-action" class="primary-button setup-next-action" href="/money">Start with income</a>
+</section>
+
 <section class="money-cards">
   <article class="card accent-cyan">
     <p>Available This Month</p>
-    <h2>{{ available_this_month | default("—", true) }}</h2>
+    <h2 id="home-available">—</h2>
     <span>After income, taxes, and expenses</span>
   </article>
 
   <article class="card accent-purple">
     <p>Monthly Income</p>
-    <h2>{{ monthly_income | default("—", true) }}</h2>
-    <span>Your estimated income</span>
+    <h2 id="home-income">—</h2>
+    <span>Estimated take-home income</span>
   </article>
 
   <article class="card accent-orange">
     <p>Monthly Expenses</p>
-    <h2>{{ monthly_expenses | default("—", true) }}</h2>
-    <span>Your saved expense total</span>
+    <h2 id="home-expenses">—</h2>
+    <span>Expenses and subscriptions</span>
   </article>
 
   <article class="card accent-blue">
     <p>Primary Goal Progress</p>
-    <h2>{{ primary_goal_progress | default("—", true) }}</h2>
-    <span>{{ primary_goal_name | default("No goal added yet", true) }}</span>
+    <h2 id="home-goal-progress">—</h2>
+    <span id="home-goal-name">No goal added yet</span>
   </article>
 </section>
 
@@ -52,23 +72,70 @@
     <p class="label">SPENDING</p>
     <h2>Where your money goes</h2>
 
-    {% for expense in expenses | default([], true) %}
-    <div class="spending-row">
-      <span>{{ expense.name }}</span>
-      <div class="progress"><div style="width: {{ expense.percent }}%"></div></div>
-      <strong>{{ expense.amount }}</strong>
-    </div>
-    {% else %}
-    <p>No expenses have been added yet.</p>
-    <a class="light-button" href="/money">Add Expenses</a>
-    {% endfor %}
+    <div id="home-spending-list"><p>No expenses have been added yet.</p><a class="light-button" href="/money">Add Expenses</a></div>
   </article>
 
   <article class="panel ai-panel">
     <p class="label">NEMOTRON AI COACH</p>
-    <h2>{{ ai_heading | default("Your personalized plan will appear here.", true) }}</h2>
-    <p>{{ ai_summary | default("Add your budget and goals, then connect Nemotron to receive guidance.", true) }}</p>
+    <h2 id="home-ai-heading">Your personalized plan will appear here.</h2>
+    <p id="home-ai-summary">Complete the setup steps above, then ask Nemotron to rank your next actions.</p>
     <a class="light-button" href="/nemotron">Open AI Coach</a>
   </article>
 </section>
+
+<script>
+  function readSaved(key, fallback) { try { return JSON.parse(localStorage.getItem(key) || JSON.stringify(fallback)); } catch { return fallback; } }
+  function formatHomeMoney(value) { return new Intl.NumberFormat("en-US", { style: "currency", currency: "USD", maximumFractionDigits: 0 }).format(Number(value) || 0); }
+  function subscriptionMonthly(item) { const cost = Number(item.cost || 0); return item.frequency === "weekly" ? cost * 52 / 12 : item.frequency === "quarterly" ? cost / 3 : item.frequency === "yearly" ? cost / 12 : cost; }
+
+  const savedMoney = readSaved("lifepath_money", { income: {}, expenses: [] });
+  const savedGoal = readSaved("lifepath_goal", null);
+  const savedCalendar = readSaved("lifepath_calendar_v2", {});
+  const savedSubscriptions = readSaved("lifepath_subscriptions_v1", []);
+  const gross = Number(savedMoney.income?.gross_income || 0);
+  const taxRate = Number(savedMoney.income?.income_tax_rate || 0) + Number(savedMoney.income?.payroll_tax_rate || 0);
+  const takeHome = gross * (1 - Math.min(taxRate, 95) / 100);
+  const expenseTotal = (savedMoney.expenses || []).reduce((sum, item) => sum + Number(item.amount || 0), 0);
+  const subscriptionTotal = savedSubscriptions.reduce((sum, item) => sum + subscriptionMonthly(item), 0);
+  const totalSpending = expenseTotal + subscriptionTotal;
+
+  document.getElementById("home-income").textContent = gross ? formatHomeMoney(takeHome) : "—";
+  document.getElementById("home-expenses").textContent = totalSpending ? formatHomeMoney(totalSpending) : "—";
+  document.getElementById("home-available").textContent = gross ? formatHomeMoney(takeHome - totalSpending) : "—";
+  if (savedGoal?.goal_name) {
+    const progress = Number(savedGoal.target_amount) ? Math.min(100, Number(savedGoal.current_amount || 0) / Number(savedGoal.target_amount) * 100) : 0;
+    document.getElementById("home-goal-progress").textContent = `${progress.toFixed(0)}%`;
+    document.getElementById("home-goal-name").textContent = savedGoal.goal_name;
+  }
+
+  const spendingList = document.getElementById("home-spending-list");
+  if ((savedMoney.expenses || []).length) {
+    const largest = Math.max(...savedMoney.expenses.map(item => Number(item.amount || 0)), 1);
+    spendingList.replaceChildren(...savedMoney.expenses.slice(0, 5).map(item => {
+      const row = document.createElement("div"); row.className = "spending-row";
+      const label = document.createElement("span"); label.textContent = item.name;
+      const progress = document.createElement("div"); progress.className = "progress"; const fill = document.createElement("div"); fill.style.width = `${Number(item.amount || 0) / largest * 100}%`; progress.appendChild(fill);
+      const amount = document.createElement("strong"); amount.textContent = formatHomeMoney(item.amount); row.append(label, progress, amount); return row;
+    }));
+  }
+
+  const setupState = {
+    income: Boolean(gross && savedMoney.income?.pay_schedule),
+    expenses: Boolean((savedMoney.expenses || []).length),
+    goal: Boolean(savedGoal?.goal_name),
+    payday: Boolean(savedCalendar.paycheck?.nextDate),
+    plan: Boolean(localStorage.getItem("lifepath_plan_generated") || savedCalendar.aiPlan),
+  };
+  const stepOrder = ["income", "expenses", "goal", "payday", "plan"];
+  const completed = stepOrder.filter(step => setupState[step]).length;
+  document.getElementById("setup-count").textContent = `${completed} of ${stepOrder.length}`;
+  document.getElementById("setup-progress-fill").style.width = `${completed / stepOrder.length * 100}%`;
+  document.querySelectorAll("[data-setup-step]").forEach((step) => {
+    const done = setupState[step.dataset.setupStep]; step.classList.toggle("complete", done); step.querySelector("i").textContent = done ? "Done ✓" : "Not done";
+  });
+  const nextKey = stepOrder.find(step => !setupState[step]); const nextAction = document.getElementById("setup-next-action");
+  const nextLabels = { income: ["Add income details", "/money"], expenses: ["Add monthly expenses", "/money"], goal: ["Choose your first goal", "/goals"], payday: ["Set your next payday", "/calendar"], plan: ["Generate your AI plan", "/nemotron"] };
+  if (nextKey) { nextAction.textContent = nextLabels[nextKey][0]; nextAction.href = nextLabels[nextKey][1]; }
+  else { nextAction.textContent = "Setup complete — review your plan"; nextAction.href = "/nemotron"; document.getElementById("setup-message").textContent = "You are all set. Update any section whenever your situation changes."; }
+</script>
 {% endblock %}

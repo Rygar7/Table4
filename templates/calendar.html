@@ -234,6 +234,7 @@
         allocation: { takeHome: context.monthlyIncome / typicalChecks, costs: (context.expenseTotal + context.subscriptionTotal) / typicalChecks, goal: goalPerCheck + emergencyPerCheck, investing: investingPerCheck },
         events: [{ title: `AI: ${actionTitle}`, amount: actionAmount, detail }],
       };
+      localStorage.setItem("lifepath_plan_generated", new Date().toISOString());
       saveCalendar(); renderCalendar(); renderAiPlan(); status.textContent = `Calendar updated from ${data.coach.generated_by === "nemotron" ? "Nemotron" : "the safe offline coach"}. Suggestions are educational, not investment advice.`;
     } catch (error) { status.textContent = error.message; }
   }

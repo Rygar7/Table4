@@ -9,6 +9,20 @@ from backend.app.nemotron import _extract_json
 client = TestClient(app)
 
 
+def test_dashboard_has_guided_setup() -> None:
+    response = client.get("/")
+    assert response.status_code == 200
+    assert "Finish your financial setup" in response.text
+    assert "Main navigation" in response.text
+
+
+def test_money_page_clarifies_monthly_income() -> None:
+    response = client.get("/money")
+    assert response.status_code == 200
+    assert "Income before taxes each month" in response.text
+    assert "Yearly equivalent" in response.text
+
+
 def test_health() -> None:
     response = client.get("/health")
     assert response.status_code == 200

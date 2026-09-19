@@ -27,21 +27,51 @@
       <span class="brand-name">Life Path AI<small>Financial simulation</small></span>
     </a>
 
-    <nav>
-      <a href="/" class="{{ 'active' if request.url.path == '/' else '' }}">Home</a>
-      <a href="/money" class="{{ 'active' if request.url.path == '/money' else '' }}">My Money</a>
-      <a href="/calendar" class="{{ 'active' if request.url.path == '/calendar' else '' }}">Calendar</a>
-      <a href="/goals" class="{{ 'active' if request.url.path == '/goals' else '' }}">Goals</a>
-      <a href="/accounts" class="{{ 'active' if request.url.path == '/accounts' else '' }}">Accounts &amp; Credit</a>
-      <a href="/subscriptions" class="{{ 'active' if request.url.path == '/subscriptions' else '' }}">Subscriptions</a>
-      <a href="/stocks" class="{{ 'active' if request.url.path == '/stocks' else '' }}">Stocks</a>
-      <a href="/ideas" class="{{ 'active' if request.url.path == '/ideas' else '' }}">Suggested Trades</a>
-      <a href="/nemotron" class="{{ 'active' if request.url.path == '/nemotron' else '' }}">My AI Plan</a>
+    {% set current_path = request.url.path %}
+    <nav class="primary-nav" aria-label="Main navigation">
+      <a href="/" class="nav-overview {{ 'active' if current_path == '/' else '' }}">Overview</a>
+
+      <details class="nav-group nav-money {{ 'active-group' if current_path in ['/money', '/subscriptions', '/accounts'] else '' }}">
+        <summary>Money <span aria-hidden="true">⌄</span></summary>
+        <div class="nav-popover">
+          <a href="/money" class="{{ 'active' if current_path == '/money' else '' }}"><strong>Budget</strong><small>Income and monthly expenses</small></a>
+          <a href="/subscriptions" class="{{ 'active' if current_path == '/subscriptions' else '' }}"><strong>Subscriptions</strong><small>Recurring charges and renewals</small></a>
+          <a href="/accounts" class="{{ 'active' if current_path == '/accounts' else '' }}"><strong>Accounts &amp; Credit</strong><small>Balances, cards, and loans</small></a>
+        </div>
+      </details>
+
+      <details class="nav-group nav-plan {{ 'active-group' if current_path in ['/goals', '/calendar'] else '' }}">
+        <summary>Plan <span aria-hidden="true">⌄</span></summary>
+        <div class="nav-popover">
+          <a href="/goals" class="{{ 'active' if current_path == '/goals' else '' }}"><strong>Goals</strong><small>What you are saving toward</small></a>
+          <a href="/calendar" class="{{ 'active' if current_path == '/calendar' else '' }}"><strong>Calendar</strong><small>Paydays, bills, and AI actions</small></a>
+        </div>
+      </details>
+
+      <details class="nav-group nav-invest {{ 'active-group' if current_path in ['/stocks', '/ideas'] else '' }}">
+        <summary>Invest <span aria-hidden="true">⌄</span></summary>
+        <div class="nav-popover">
+          <a href="/stocks" class="{{ 'active' if current_path == '/stocks' else '' }}"><strong>Stock Explorer</strong><small>Prices and risk explanations</small></a>
+          <a href="/ideas" class="{{ 'active' if current_path == '/ideas' else '' }}"><strong>Research Ideas</strong><small>Categories, trends, and sources</small></a>
+        </div>
+      </details>
+
+      <a href="/nemotron" class="nav-ai {{ 'active' if current_path == '/nemotron' else '' }}">AI Coach</a>
     </nav>
   </header>
 
   <main>
     {% block content %}{% endblock %}
   </main>
+  <script>
+    document.querySelectorAll(".nav-group").forEach((group) => {
+      group.addEventListener("toggle", () => {
+        if (group.open) document.querySelectorAll(".nav-group").forEach((other) => { if (other !== group) other.open = false; });
+      });
+    });
+    document.addEventListener("click", (event) => {
+      if (!event.target.closest(".nav-group")) document.querySelectorAll(".nav-group[open]").forEach((group) => group.open = false);
+    });
+  </script>
 </body>
 </html>

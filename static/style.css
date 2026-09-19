@@ -1266,7 +1266,7 @@ main::before {
 .chart-tooltip {
   position: absolute;
   z-index: 3;
-  min-width: 116px;
+  min-width: 168px;
   padding: 9px 11px;
   text-align: center;
   pointer-events: none;
@@ -1280,6 +1280,9 @@ main::before {
 .chart-tooltip strong, .chart-tooltip span { display: block; }
 .chart-tooltip strong { color: var(--cyan); font-size: 15px; }
 .chart-tooltip span { margin-top: 3px; color: var(--muted); font-size: 9px; }
+.tooltip-market-data { display: grid; margin-top: 8px; padding-top: 7px; grid-template-columns: 1fr 1fr; gap: 5px 10px; text-align: left; border-top: 1px solid rgba(65, 230, 211, .15); }
+.tooltip-market-data span { display: flex; justify-content: space-between; gap: 7px; margin: 0; }
+.tooltip-market-data b { color: var(--text); font-weight: 500; }
 .drag-hint { margin: 8px 0 0; color: var(--cyan); font-size: 10px; text-align: center; }
 
 @media (max-width: 600px) {

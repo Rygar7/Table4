@@ -54,7 +54,13 @@
         <g id="chart-grid"></g><path id="chart-area"></path><path id="chart-line"></path><g id="chart-points"></g>
         <g id="chart-cursor" hidden><line y1="20" y2="256"></line><circle r="6"></circle></g>
       </svg>
-      <div id="chart-tooltip" class="chart-tooltip" hidden><strong>—</strong><span>—</span></div>
+      <div id="chart-tooltip" class="chart-tooltip" hidden>
+        <strong id="tooltip-price">—</strong><span id="tooltip-date">—</span>
+        <div class="tooltip-market-data">
+          <span>Open <b id="tooltip-open">—</b></span><span>High <b id="tooltip-high">—</b></span>
+          <span>Low <b id="tooltip-low">—</b></span><span>Volume <b id="tooltip-volume">—</b></span>
+        </div>
+      </div>
       <div id="chart-empty" class="chart-empty"><span>⌁</span><p>Search a symbol to draw its recent price history.</p></div>
     </div>
     <div id="chart-axis" class="chart-axis"><span id="axis-start">90 market days ago</span><span>Latest market day</span></div>
@@ -127,7 +133,7 @@
     const y = value => top + (high - value) / Math.max(high - low, 1) * (height - top - bottom);
     const line = closes.map((value, index) => `${index ? "L" : "M"}${x(index).toFixed(1)},${y(value).toFixed(1)}`).join(" ");
     const isUp = closes.at(-1) >= closes[0];
-    chartState = { bars, closes, x, y, left, right, width, isUp };
+    chartState = { bars, closes, x, y, left, right, width, height, isUp };
     document.getElementById("chart-line").setAttribute("d", line);
     document.getElementById("chart-line").setAttribute("class", isUp ? "chart-line up" : "chart-line down");
     const area = `${line} L${x(closes.length - 1).toFixed(1)},${height - bottom} L${left},${height - bottom} Z`;
@@ -166,6 +172,11 @@
     document.getElementById("chart-tooltip").hidden = true;
   }
 
+  function hideChartInspection() {
+    document.getElementById("chart-cursor").hidden = true;
+    document.getElementById("chart-tooltip").hidden = true;
+  }
+
   function inspectChart(event) {
     if (!chartState) return;
     const svg = document.getElementById("stock-chart");
@@ -176,16 +187,26 @@
     const ratio = Math.max(0, Math.min(1, (svgX - chartState.left) / plotWidth));
     const index = Math.round(ratio * (chartState.closes.length - 1));
     const pointX = chartState.x(index); const pointY = chartState.y(chartState.closes[index]);
+    const pointScreenY = pointY / chartState.height * rect.height;
+    const distanceFromLine = Math.abs((event.clientY - rect.top) - pointScreenY);
+    if (event.pointerType === "mouse" && distanceFromLine > 18) {
+      hideChartInspection(); return;
+    }
     const cursor = document.getElementById("chart-cursor");
     const cursorLine = cursor.querySelector("line"); const cursorPoint = cursor.querySelector("circle");
     cursorLine.setAttribute("x1", pointX); cursorLine.setAttribute("x2", pointX);
     cursorPoint.setAttribute("cx", pointX); cursorPoint.setAttribute("cy", pointY);
     cursorPoint.setAttribute("class", chartState.isUp ? "up" : "down"); cursor.hidden = false;
     const tooltip = document.getElementById("chart-tooltip");
-    tooltip.querySelector("strong").textContent = currency(chartState.closes[index]);
-    tooltip.querySelector("span").textContent = new Date(chartState.bars[index].timestamp).toLocaleDateString("en-US", { month: "short", day: "numeric", year: "numeric" });
-    tooltip.style.left = `${Math.max(58, Math.min(rect.width - 58, pointerX))}px`;
-    tooltip.style.top = `${Math.max(4, event.clientY - rect.top - 66)}px`;
+    const bar = chartState.bars[index];
+    document.getElementById("tooltip-price").textContent = currency(bar.close);
+    document.getElementById("tooltip-date").textContent = new Date(bar.timestamp).toLocaleDateString("en-US", { month: "short", day: "numeric", year: "numeric" });
+    document.getElementById("tooltip-open").textContent = currency(bar.open);
+    document.getElementById("tooltip-high").textContent = currency(bar.high);
+    document.getElementById("tooltip-low").textContent = currency(bar.low);
+    document.getElementById("tooltip-volume").textContent = new Intl.NumberFormat("en-US", { notation: "compact", maximumFractionDigits: 1 }).format(bar.volume);
+    tooltip.style.left = `${Math.max(82, Math.min(rect.width - 82, pointerX))}px`;
+    tooltip.style.top = `${Math.max(4, pointScreenY - 112)}px`;
     tooltip.hidden = false;
   }
 
@@ -197,7 +218,8 @@
     if (draggingChart || event.pointerType === "mouse") inspectChart(event);
   });
   chart.addEventListener("pointerup", event => { draggingChart = false; chart.releasePointerCapture(event.pointerId); });
-  chart.addEventListener("pointercancel", () => { draggingChart = false; });
+  chart.addEventListener("pointerleave", event => { if (!draggingChart && event.pointerType === "mouse") hideChartInspection(); });
+  chart.addEventListener("pointercancel", () => { draggingChart = false; hideChartInspection(); });
 
   document.querySelectorAll("[data-days]").forEach(button => button.addEventListener("click", () => {
     selectedDays = Number(button.dataset.days);
@@ -240,7 +262,7 @@
       document.getElementById("quote-feed").textContent = `${data.market_feed} market feed`;
       document.getElementById("quote-change").className = data.change == null ? "" : data.change >= 0 ? "positive-text" : "negative-text";
       drawChart(history.bars);
-      statusText.textContent = data.disclaimer;
+      statusText.textContent = `${data.disclaimer} Chart values are adjusted daily bars from the ${history.market_feed} feed.`;
       result.hidden = false;
       currentSymbol = data.symbol;
       insightButton.disabled = false;

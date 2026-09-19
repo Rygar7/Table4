@@ -80,8 +80,9 @@ def _get_stock_quote_cached(normalized: str, _cache_window: int) -> dict:
     change = None
     change_percent = None
     if previous_close:
-        change = round(float(price) - float(previous_close), 2)
-        change_percent = round(change / float(previous_close) * 100, 2)
+        raw_change = float(price) - float(previous_close)
+        change = round(raw_change, 2)
+        change_percent = round(raw_change / float(previous_close) * 100, 2)
 
     return {
         "symbol": normalized,

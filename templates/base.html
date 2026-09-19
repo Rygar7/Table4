@@ -4,6 +4,7 @@
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>LifePath AI</title>
+  <link rel="icon" type="image/png" href="{{ url_for('static', path='lifepath-logo.png') }}">
   <link rel="stylesheet" href="{{ url_for('static', path='style.css') }}">
 </head>
 {% set page_theme = {
@@ -18,7 +19,12 @@
 }.get(request.url.path, 'home') %}
 <body class="theme-{{ page_theme }}">
   <header>
-    <div class="logo">LifePath AI</div>
+    <a class="brand" href="/" aria-label="Life Path AI home">
+      <span class="brand-mark" aria-hidden="true">
+        <img src="{{ url_for('static', path='lifepath-logo.png') }}" alt="">
+      </span>
+      <span class="brand-name">Life Path AI<small>Financial simulation</small></span>
+    </a>
 
     <nav>
       <a href="/" class="{{ 'active' if request.url.path == '/' else '' }}">Home</a>

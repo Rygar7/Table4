@@ -87,24 +87,50 @@ header {
   backdrop-filter: blur(18px);
 }
 
-.logo {
-  color: var(--green);
-  font-size: 22px;
-  font-weight: 700;
-  letter-spacing: -0.8px;
-  text-shadow: 0 0 20px rgba(85, 242, 138, 0.45);
+.brand {
+  display: flex;
+  flex: 0 0 auto;
+  align-items: center;
+  gap: 10px;
+  color: var(--text);
+  text-decoration: none;
 }
 
-.logo::before {
-  display: inline-block;
-  width: 11px;
-  height: 11px;
-  margin-right: 8px;
-  background: var(--green);
-  border-radius: 2px;
-  box-shadow: 0 0 16px var(--green);
-  content: "";
-  transform: rotate(45deg);
+.brand-mark {
+  position: relative;
+  display: block;
+  width: 48px;
+  height: 48px;
+  overflow: hidden;
+  background: #1d0901;
+  border: 1px solid rgba(var(--theme-rgb), 0.45);
+  border-radius: 13px;
+  box-shadow: 0 0 22px rgba(var(--theme-rgb), 0.24);
+}
+
+.brand-mark img {
+  position: absolute;
+  width: 132px;
+  max-width: none;
+  height: 132px;
+  transform: translate(-42px, -30px);
+}
+
+.brand-name {
+  font-size: 17px;
+  font-weight: 700;
+  letter-spacing: -0.5px;
+  line-height: 1.05;
+}
+
+.brand-name small {
+  display: block;
+  margin-top: 4px;
+  color: var(--green);
+  font-family: "DM Mono", monospace;
+  font-size: 7px;
+  letter-spacing: 1px;
+  text-transform: uppercase;
 }
 
 nav {
@@ -733,6 +759,10 @@ details a {
     overflow-x: auto;
   }
 
+  .brand-name small {
+    display: none;
+  }
+
   main {
     padding: 38px 16px 70px;
   }
@@ -765,6 +795,21 @@ details a {
 }
 
 @media (max-width: 500px) {
+  .brand-name {
+    font-size: 15px;
+  }
+
+  .brand-mark {
+    width: 42px;
+    height: 42px;
+  }
+
+  .brand-mark img {
+    width: 116px;
+    height: 116px;
+    transform: translate(-37px, -26px);
+  }
+
   .spending-row {
     grid-template-columns: 1fr;
     gap: 8px;

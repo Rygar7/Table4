@@ -1240,3 +1240,49 @@ main::before {
 @media (max-width: 760px) {
   .plan-input-summary { grid-template-columns: 1fr 1fr; }
 }
+
+/* Interactive stock chart controls */
+.chart-tools { display: flex; align-items: flex-end; gap: 10px; flex-direction: column; }
+.range-controls { display: flex; gap: 4px; padding: 4px; background: rgba(0, 0, 0, .2); border-radius: 9px; }
+.range-controls button {
+  min-width: 38px;
+  padding: 6px 8px;
+  color: var(--muted);
+  font-family: "DM Mono", monospace;
+  font-size: 10px;
+  background: transparent;
+  border: 0;
+  border-radius: 6px;
+  cursor: pointer;
+}
+.range-controls button:hover { color: var(--green-light); }
+.range-controls button.selected { color: #04110f; background: var(--green); box-shadow: 0 0 13px rgba(var(--theme-rgb), .25); }
+#stock-chart { cursor: crosshair; touch-action: none; user-select: none; }
+#chart-cursor line { stroke: rgba(240, 255, 244, .55); stroke-width: 1; stroke-dasharray: 4 5; }
+#chart-cursor[hidden] { display: none; }
+#chart-cursor circle { stroke: #06100d; stroke-width: 3; filter: drop-shadow(0 0 7px currentColor); }
+#chart-cursor circle.up { fill: var(--cyan); color: var(--cyan); }
+#chart-cursor circle.down { fill: var(--coral); color: var(--coral); }
+.chart-tooltip {
+  position: absolute;
+  z-index: 3;
+  min-width: 116px;
+  padding: 9px 11px;
+  text-align: center;
+  pointer-events: none;
+  background: rgba(3, 12, 10, .94);
+  border: 1px solid rgba(65, 230, 211, .35);
+  border-radius: 9px;
+  box-shadow: 0 10px 26px rgba(0, 0, 0, .42);
+  transform: translateX(-50%);
+}
+.chart-tooltip[hidden] { display: none; }
+.chart-tooltip strong, .chart-tooltip span { display: block; }
+.chart-tooltip strong { color: var(--cyan); font-size: 15px; }
+.chart-tooltip span { margin-top: 3px; color: var(--muted); font-size: 9px; }
+.drag-hint { margin: 8px 0 0; color: var(--cyan); font-size: 10px; text-align: center; }
+
+@media (max-width: 600px) {
+  .chart-tools { width: 100%; align-items: stretch; }
+  .range-controls button { flex: 1; }
+}

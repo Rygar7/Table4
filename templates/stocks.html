@@ -32,10 +32,18 @@
   <article class="panel chart-panel">
     <div class="chart-heading">
       <div>
-        <p class="label">90-DAY PRICE HISTORY</p>
+        <p id="chart-range-label" class="label">90-MARKET-DAY PRICE HISTORY</p>
         <h2 id="quote-heading">Choose a stock to begin</h2>
       </div>
-      <div id="trend-badge" class="trend-badge neutral">Waiting for a symbol</div>
+      <div class="chart-tools">
+        <div id="trend-badge" class="trend-badge neutral">Waiting for a symbol</div>
+        <div class="range-controls" aria-label="Chart time range">
+          <button type="button" data-days="7">7D</button>
+          <button type="button" data-days="30">30D</button>
+          <button type="button" data-days="90" class="selected">90D</button>
+          <button type="button" data-days="365">1Y</button>
+        </div>
+      </div>
     </div>
     <div id="chart-wrap" class="chart-wrap empty-chart">
       <svg id="stock-chart" viewBox="0 0 760 280" role="img" aria-label="Historical closing-price chart">
@@ -44,10 +52,13 @@
           <linearGradient id="chart-fill-down" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="#ff6f91" stop-opacity=".40"/><stop offset="1" stop-color="#ff6f91" stop-opacity="0"/></linearGradient>
         </defs>
         <g id="chart-grid"></g><path id="chart-area"></path><path id="chart-line"></path><g id="chart-points"></g>
+        <g id="chart-cursor" hidden><line y1="20" y2="256"></line><circle r="6"></circle></g>
       </svg>
+      <div id="chart-tooltip" class="chart-tooltip" hidden><strong>—</strong><span>—</span></div>
       <div id="chart-empty" class="chart-empty"><span>⌁</span><p>Search a symbol to draw its recent price history.</p></div>
     </div>
-    <div id="chart-axis" class="chart-axis"><span>90 days ago</span><span>Latest market day</span></div>
+    <div id="chart-axis" class="chart-axis"><span id="axis-start">90 market days ago</span><span>Latest market day</span></div>
+    <p id="drag-hint" class="drag-hint" hidden>Drag across the graph to inspect each closing price.</p>
     <p id="quote-status" class="chart-caption">Prices come from Alpaca’s IEX market feed and may be delayed.</p>
   </article>
 
@@ -63,8 +74,8 @@
       <span id="quote-feed">—</span>
     </article>
     <div class="mini-stat-grid">
-      <article class="mini-stat high-stat"><span>90-day high</span><strong id="period-high">—</strong></article>
-      <article class="mini-stat low-stat"><span>90-day low</span><strong id="period-low">—</strong></article>
+      <article class="mini-stat high-stat"><span id="period-high-label">Range high</span><strong id="period-high">—</strong></article>
+      <article class="mini-stat low-stat"><span id="period-low-label">Range low</span><strong id="period-low">—</strong></article>
     </div>
   </aside>
 </section>
@@ -97,6 +108,9 @@
   const result = document.getElementById("quote-result");
   const insightButton = document.getElementById("ask-nemotron");
   let currentSymbol = "";
+  let selectedDays = 90;
+  let chartState = null;
+  let draggingChart = false;
 
   const currency = (value) => new Intl.NumberFormat("en-US", {
     style: "currency", currency: "USD", maximumFractionDigits: 2,
@@ -113,6 +127,7 @@
     const y = value => top + (high - value) / Math.max(high - low, 1) * (height - top - bottom);
     const line = closes.map((value, index) => `${index ? "L" : "M"}${x(index).toFixed(1)},${y(value).toFixed(1)}`).join(" ");
     const isUp = closes.at(-1) >= closes[0];
+    chartState = { bars, closes, x, y, left, right, width, isUp };
     document.getElementById("chart-line").setAttribute("d", line);
     document.getElementById("chart-line").setAttribute("class", isUp ? "chart-line up" : "chart-line down");
     const area = `${line} L${x(closes.length - 1).toFixed(1)},${height - bottom} L${left},${height - bottom} Z`;
@@ -141,8 +156,54 @@
     const periodChange = (closes.at(-1) / closes[0] - 1) * 100;
     const badge = document.getElementById("trend-badge");
     badge.className = `trend-badge ${periodChange >= 0 ? "positive" : "negative"}`;
-    badge.textContent = `${periodChange >= 0 ? "↗" : "↘"} ${Math.abs(periodChange).toFixed(1)}% over shown period`;
+    badge.textContent = `${periodChange >= 0 ? "↗" : "↘"} ${Math.abs(periodChange).toFixed(1)}% over ${closes.length} market days`;
+    document.getElementById("chart-range-label").textContent = `${selectedDays === 365 ? "1-YEAR" : `${selectedDays}-MARKET-DAY`} PRICE HISTORY`;
+    document.getElementById("axis-start").textContent = `${closes.length} market days ago`;
+    document.getElementById("period-high-label").textContent = `${selectedDays === 365 ? "1-year" : `${selectedDays}-day`} high`;
+    document.getElementById("period-low-label").textContent = `${selectedDays === 365 ? "1-year" : `${selectedDays}-day`} low`;
+    document.getElementById("drag-hint").hidden = false;
+    document.getElementById("chart-cursor").hidden = true;
+    document.getElementById("chart-tooltip").hidden = true;
   }
+
+  function inspectChart(event) {
+    if (!chartState) return;
+    const svg = document.getElementById("stock-chart");
+    const rect = svg.getBoundingClientRect();
+    const pointerX = Math.max(0, Math.min(rect.width, event.clientX - rect.left));
+    const svgX = pointerX / rect.width * chartState.width;
+    const plotWidth = chartState.width - chartState.left - chartState.right;
+    const ratio = Math.max(0, Math.min(1, (svgX - chartState.left) / plotWidth));
+    const index = Math.round(ratio * (chartState.closes.length - 1));
+    const pointX = chartState.x(index); const pointY = chartState.y(chartState.closes[index]);
+    const cursor = document.getElementById("chart-cursor");
+    const cursorLine = cursor.querySelector("line"); const cursorPoint = cursor.querySelector("circle");
+    cursorLine.setAttribute("x1", pointX); cursorLine.setAttribute("x2", pointX);
+    cursorPoint.setAttribute("cx", pointX); cursorPoint.setAttribute("cy", pointY);
+    cursorPoint.setAttribute("class", chartState.isUp ? "up" : "down"); cursor.hidden = false;
+    const tooltip = document.getElementById("chart-tooltip");
+    tooltip.querySelector("strong").textContent = currency(chartState.closes[index]);
+    tooltip.querySelector("span").textContent = new Date(chartState.bars[index].timestamp).toLocaleDateString("en-US", { month: "short", day: "numeric", year: "numeric" });
+    tooltip.style.left = `${Math.max(58, Math.min(rect.width - 58, pointerX))}px`;
+    tooltip.style.top = `${Math.max(4, event.clientY - rect.top - 66)}px`;
+    tooltip.hidden = false;
+  }
+
+  const chart = document.getElementById("stock-chart");
+  chart.addEventListener("pointerdown", event => {
+    draggingChart = true; chart.setPointerCapture(event.pointerId); inspectChart(event); event.preventDefault();
+  });
+  chart.addEventListener("pointermove", event => {
+    if (draggingChart || event.pointerType === "mouse") inspectChart(event);
+  });
+  chart.addEventListener("pointerup", event => { draggingChart = false; chart.releasePointerCapture(event.pointerId); });
+  chart.addEventListener("pointercancel", () => { draggingChart = false; });
+
+  document.querySelectorAll("[data-days]").forEach(button => button.addEventListener("click", () => {
+    selectedDays = Number(button.dataset.days);
+    document.querySelectorAll("[data-days]").forEach(item => item.classList.toggle("selected", item === button));
+    if (currentSymbol) form.requestSubmit();
+  }));
 
   document.querySelectorAll("[data-symbol]").forEach(button => button.addEventListener("click", () => {
     symbolInput.value = button.dataset.symbol;
@@ -160,7 +221,7 @@
     try {
       const [quoteResponse, historyResponse] = await Promise.all([
         fetch(`/api/v1/stocks/${encodeURIComponent(symbol)}`),
-        fetch(`/api/v1/stocks/${encodeURIComponent(symbol)}/history?days=90`),
+        fetch(`/api/v1/stocks/${encodeURIComponent(symbol)}/history?days=${selectedDays}`),
       ]);
       const data = await quoteResponse.json();
       const history = await historyResponse.json();

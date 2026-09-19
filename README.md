@@ -31,7 +31,7 @@ Open `http://127.0.0.1:8000/docs` for the interactive API documentation.
 - `POST /api/v1/credit/advice` calculates card utilization and debt totals, then asks
   Nemotron to rank three educational credit-improvement priorities.
 
-Open `http://127.0.0.1:8000/stocks` to use the connected stock lookup page.
+Open `http://127.0.0.1:8000/stocks` for interactive 7-day, 30-day, 90-day, and one-year price charts.
 Open `http://127.0.0.1:8000/ideas` for the simplified Suggested Trades experience.
 Open `http://127.0.0.1:8000/accounts` to add bank balances, credit cards, and loans.
 Open `http://127.0.0.1:8000/subscriptions` to total recurring costs and track renewal warnings.

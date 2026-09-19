@@ -885,12 +885,13 @@ details a {
 
 nav a:nth-child(1) { --tab-color: #41e6d3; }
 nav a:nth-child(2) { --tab-color: #63a8ff; }
-nav a:nth-child(3) { --tab-color: #a987ff; }
-nav a:nth-child(4) { --tab-color: #ffb65c; }
-nav a:nth-child(5) { --tab-color: #ffd166; }
-nav a:nth-child(6) { --tab-color: #31dfb6; }
-nav a:nth-child(7) { --tab-color: #ff6f91; }
-nav a:nth-child(8) { --tab-color: #d182ff; }
+nav a:nth-child(3) { --tab-color: #ffd166; }
+nav a:nth-child(4) { --tab-color: #a987ff; }
+nav a:nth-child(5) { --tab-color: #ffb65c; }
+nav a:nth-child(6) { --tab-color: #ffd166; }
+nav a:nth-child(7) { --tab-color: #31dfb6; }
+nav a:nth-child(8) { --tab-color: #ff6f91; }
+nav a:nth-child(9) { --tab-color: #d182ff; }
 
 body::before,
 body::after {
@@ -1289,4 +1290,138 @@ main::before {
 @media (max-width: 600px) {
   .chart-tools { width: 100%; align-items: stretch; }
   .range-controls button { flex: 1; }
+}
+
+/* Smart financial calendar */
+.calendar-gradient {
+  color: transparent;
+  background: linear-gradient(90deg, #ffd166, #ffb65c 52%, #ff8f70);
+  background-clip: text;
+  -webkit-background-clip: text;
+}
+.calendar-stats {
+  display: grid;
+  margin-bottom: 16px;
+  grid-template-columns: repeat(4, 1fr);
+  gap: 12px;
+}
+.calendar-layout { display: grid; grid-template-columns: minmax(0, 1fr) 280px; gap: 16px; align-items: start; }
+.calendar-board { padding: 0; overflow: hidden; }
+.calendar-toolbar { display: flex; align-items: center; justify-content: space-between; gap: 14px; padding: 20px 22px; border-bottom: 1px solid var(--line); }
+.calendar-toolbar h2 { margin: 0; }
+.calendar-actions { display: flex; align-items: center; gap: 7px; }
+.calendar-actions button {
+  min-width: 36px;
+  height: 34px;
+  padding: 0 10px;
+  color: var(--text);
+  font-family: inherit;
+  background: rgba(255, 209, 102, .08);
+  border: 1px solid rgba(255, 209, 102, .2);
+  border-radius: 8px;
+  cursor: pointer;
+}
+.calendar-actions button:hover { color: #ffd166; border-color: #ffd166; }
+.calendar-weekdays, .calendar-grid { display: grid; grid-template-columns: repeat(7, minmax(0, 1fr)); }
+.calendar-weekdays { color: var(--muted); background: rgba(0, 0, 0, .14); border-bottom: 1px solid var(--line); }
+.calendar-weekdays span { padding: 9px 7px; font-family: "DM Mono", monospace; font-size: 9px; text-align: center; text-transform: uppercase; }
+.calendar-day {
+  position: relative;
+  min-width: 0;
+  min-height: 108px;
+  padding: 8px 6px;
+  background: rgba(5, 12, 9, .46);
+  border-right: 1px solid rgba(255, 209, 102, .09);
+  border-bottom: 1px solid rgba(255, 209, 102, .09);
+}
+.calendar-day:nth-child(7n) { border-right: 0; }
+.calendar-day.outside-month { opacity: .32; background: rgba(0, 0, 0, .2); }
+.calendar-day.today { background: rgba(255, 209, 102, .07); box-shadow: inset 0 0 0 1px rgba(255, 209, 102, .45); }
+.calendar-day-number { display: grid; place-items: center; width: 23px; height: 23px; margin: 0 0 5px 2px; color: var(--muted); font-size: 11px; border-radius: 50%; }
+.calendar-day.today .calendar-day-number { color: #161003; font-weight: 700; background: #ffd166; }
+.calendar-day small { display: block; margin: 4px 3px; color: var(--muted); font-size: 8px; }
+.calendar-event {
+  display: grid;
+  grid-template-columns: 5px minmax(0, 1fr);
+  gap: 4px;
+  align-items: center;
+  margin: 3px 0;
+  padding: 4px 5px;
+  overflow: hidden;
+  color: #f7fff9;
+  font-size: 8px;
+  background: rgba(255, 255, 255, .055);
+  border-radius: 5px;
+}
+.calendar-event i { width: 5px; height: 5px; background: currentColor; border-radius: 50%; box-shadow: 0 0 7px currentColor; }
+.calendar-event span, .calendar-event b { overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+.calendar-event b { grid-column: 2; color: inherit; font-size: 7px; font-weight: 500; opacity: .78; }
+.calendar-event.payday { color: #63a8ff; background: rgba(99, 168, 255, .11); }
+.calendar-event.bill { color: #ff8ca7; background: rgba(255, 111, 145, .1); }
+.calendar-event.subscription { color: #d4b7ff; background: rgba(169, 135, 255, .12); }
+.calendar-event.goal { color: #55f28a; background: rgba(85, 242, 138, .1); }
+.calendar-event.ai { color: #ffd166; background: rgba(255, 209, 102, .12); border: 1px solid rgba(255, 209, 102, .18); }
+.calendar-legend { display: flex; flex-wrap: wrap; gap: 15px; padding: 13px 20px; color: var(--muted); font-size: 9px; }
+.calendar-legend span { display: flex; align-items: center; gap: 5px; }
+.event-dot { width: 7px; height: 7px; border-radius: 50%; }
+.event-dot.payday { background: #63a8ff; } .event-dot.bill { background: #ff6f91; } .event-dot.subscription { background: #a987ff; } .event-dot.goal { background: #55f28a; } .event-dot.ai { background: #ffd166; }
+.paycheck-panel { position: sticky; top: 94px; }
+.calendar-help { margin-top: 8px; color: var(--muted); font-size: 12px; }
+.paycheck-form { display: grid; gap: 10px; margin: 18px 0; }
+.paycheck-form label, .calendar-event-form label { color: var(--muted); font-size: 10px; }
+.paycheck-form input, .calendar-event-form input, .calendar-event-form select { display: block; width: 100%; margin-top: 6px; }
+.paycheck-summary { display: grid; gap: 0; margin: 16px 0; border: 1px solid rgba(255, 209, 102, .15); border-radius: 11px; }
+.paycheck-summary div { display: flex; justify-content: space-between; gap: 12px; padding: 11px 12px; border-bottom: 1px solid rgba(255, 209, 102, .1); }
+.paycheck-summary div:last-child { border: 0; }
+.paycheck-summary span { color: var(--muted); font-size: 10px; }
+.paycheck-summary strong { color: #ffd166; font-size: 11px; text-align: right; }
+.small-inline-link { color: #ffd166; font-size: 11px; text-decoration: none; }
+.calendar-form-panel { margin-top: 16px; }
+.calendar-event-form { display: grid; grid-template-columns: 1.3fr 1fr .8fr 1fr auto; gap: 11px; align-items: end; margin-top: 18px; }
+.calendar-event-form .primary-button { min-height: 43px; white-space: nowrap; }
+.calendar-bottom-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 16px; margin-top: 16px; }
+.ai-calendar-panel { background: linear-gradient(145deg, rgba(255, 209, 102, .09), rgba(13, 15, 10, .9)); }
+.ai-calendar-heading { display: flex; justify-content: space-between; gap: 16px; }
+.ai-orbit { display: grid; place-items: center; flex: 0 0 auto; width: 48px; height: 48px; color: #ffd166; font-size: 21px; background: rgba(255, 209, 102, .08); border: 1px solid rgba(255, 209, 102, .3); border-radius: 50%; box-shadow: 0 0 24px rgba(255, 209, 102, .12); }
+.ai-calendar-priorities { display: grid; gap: 8px; margin: 18px 0 0; padding: 0; list-style: none; }
+.ai-paycheck-allocation { display: grid; margin-top: 18px; grid-template-columns: 1fr 1fr; gap: 8px; }
+.ai-paycheck-allocation[hidden] { display: none; }
+.ai-paycheck-allocation .label { grid-column: 1 / -1; }
+.ai-paycheck-allocation > div { padding: 11px; background: rgba(0, 0, 0, .2); border: 1px solid rgba(255, 209, 102, .13); border-radius: 9px; }
+.ai-paycheck-allocation span, .ai-paycheck-allocation strong { display: block; }
+.ai-paycheck-allocation span { margin-bottom: 5px; color: var(--muted); font-size: 9px; }
+.ai-paycheck-allocation strong { color: #ffd166; font-size: 13px; }
+.ai-calendar-priorities li { padding: 11px 12px; background: rgba(0, 0, 0, .18); border-left: 3px solid #ffd166; border-radius: 7px; }
+.ai-calendar-priorities strong, .ai-calendar-priorities span { display: block; }
+.ai-calendar-priorities strong { font-size: 11px; }
+.ai-calendar-priorities span { margin-top: 4px; color: var(--muted); font-size: 9px; line-height: 1.45; }
+.upcoming-events { margin-top: 14px; }
+.upcoming-row { display: grid; grid-template-columns: 44px 1fr auto; align-items: center; gap: 11px; padding: 11px 0; border-bottom: 1px solid rgba(255, 209, 102, .11); }
+.upcoming-row time { display: grid; place-items: center; width: 42px; height: 42px; background: rgba(255, 209, 102, .08); border-radius: 10px; }
+.upcoming-row time strong { color: #ffd166; font-size: 15px; }
+.upcoming-row time span { color: var(--muted); font-size: 8px; text-transform: uppercase; }
+.upcoming-row > div strong, .upcoming-row > div span { display: block; }
+.upcoming-row > div strong { font-size: 11px; }
+.upcoming-row > div span { margin-top: 3px; color: var(--muted); font-size: 9px; }
+.upcoming-row button { color: var(--muted); font-family: inherit; font-size: 9px; background: transparent; border: 0; cursor: pointer; }
+
+@media (max-width: 980px) {
+  .calendar-layout { grid-template-columns: 1fr; }
+  .paycheck-panel { position: static; }
+  .calendar-event-form { grid-template-columns: 1fr 1fr; }
+  .calendar-event-form .primary-button { align-self: end; }
+}
+@media (max-width: 760px) {
+  .calendar-stats, .calendar-bottom-grid { grid-template-columns: 1fr 1fr; }
+  .calendar-day { min-height: 88px; padding: 5px 3px; }
+  .calendar-event { grid-template-columns: 5px minmax(0, 1fr); padding: 3px; }
+  .calendar-event b { display: none; }
+}
+@media (max-width: 540px) {
+  .calendar-stats, .calendar-bottom-grid, .calendar-event-form { grid-template-columns: 1fr; }
+  .calendar-toolbar { align-items: flex-start; flex-direction: column; }
+  .calendar-weekdays span { font-size: 7px; }
+  .calendar-day { min-height: 65px; }
+  .calendar-event { display: block; width: 7px; height: 7px; margin: 4px; padding: 0; background: currentColor; border-radius: 50%; }
+  .calendar-event i, .calendar-event span { display: none; }
 }

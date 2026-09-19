@@ -21,6 +21,13 @@ def test_subscriptions_page() -> None:
     assert "SUBSCRIPTION TRACKER" in response.text
 
 
+def test_calendar_page() -> None:
+    response = client.get("/calendar")
+    assert response.status_code == 200
+    assert "SMART MONEY CALENDAR" in response.text
+    assert "Build My AI Schedule" in response.text
+
+
 def test_model_json_parser_ignores_trailing_text() -> None:
     assert _extract_json('{"status": "ok"}\nextra') == {"status": "ok"}
 

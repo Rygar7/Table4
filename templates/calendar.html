@@ -1,34 +1,267 @@
 {% extends "base.html" %}
 
 {% block content %}
-<section class="welcome">
-  <div>
-    <p class="label">MONEY CALENDAR</p>
-    <h1>Financial dates</h1>
-    <p>Track paydays, bills, subscriptions, and goal dates.</p>
-  </div>
+<div class="calendar-shell">
+  <section class="welcome compact-welcome">
+    <div>
+      <p class="label">SMART MONEY CALENDAR</p>
+      <h1>See your whole month.<br><span class="calendar-gradient">Before you spend it.</span></h1>
+      <p>Paydays, bills, subscriptions, and AI-planned money moves in one beginner-friendly calendar.</p>
+    </div>
+    <a class="primary-button" href="#calendar-setup">Add Financial Date</a>
+  </section>
 
-  <button class="primary-button">Add Date</button>
-</section>
+  <section class="calendar-stats">
+    <article class="mini-dashboard-card blue-card"><span>Expected income</span><strong id="calendar-income">$0</strong></article>
+    <article class="mini-dashboard-card coral-card"><span>Monthly expenses</span><strong id="calendar-expenses">$0</strong></article>
+    <article class="mini-dashboard-card purple-card"><span>Subscriptions</span><strong id="calendar-subscriptions">$0</strong></article>
+    <article class="mini-dashboard-card gold-card"><span>Estimated money left</span><strong id="calendar-leftover">$0</strong></article>
+  </section>
 
-<section class="panel">
-  <p class="label">UPCOMING DATES</p>
-  <h2>Your financial schedule</h2>
+  <section class="calendar-layout">
+    <article class="panel calendar-board">
+      <div class="calendar-toolbar">
+        <div><p class="label">MONTH VIEW</p><h2 id="calendar-month">Month</h2></div>
+        <div class="calendar-actions">
+          <button id="previous-month" type="button" aria-label="Previous month">←</button>
+          <button id="today-month" type="button">Today</button>
+          <button id="next-month" type="button" aria-label="Next month">→</button>
+        </div>
+      </div>
+      <div class="calendar-weekdays" aria-hidden="true"><span>Sun</span><span>Mon</span><span>Tue</span><span>Wed</span><span>Thu</span><span>Fri</span><span>Sat</span></div>
+      <div id="calendar-grid" class="calendar-grid" aria-label="Financial calendar"></div>
+      <div class="calendar-legend">
+        <span><i class="event-dot payday"></i>Paycheck</span><span><i class="event-dot bill"></i>Expense</span><span><i class="event-dot subscription"></i>Subscription</span><span><i class="event-dot goal"></i>Goal</span><span><i class="event-dot ai"></i>Nemotron plan</span>
+      </div>
+    </article>
 
-  {% for event in events | default([], true) %}
-  <div class="spending-row">
-    <span>{{ event.date }}</span>
-    <strong>{{ event.title }}</strong>
-  </div>
-  {% else %}
-  <p>No financial dates have been added yet.</p>
-  {% endfor %}
-</section>
+    <aside class="panel paycheck-panel">
+      <p class="label">PAYCHECK SETUP</p>
+      <h2>Plan each check</h2>
+      <p class="calendar-help">Choose your next payday. Your saved pay schedule and estimated take-home income do the rest.</p>
+      <form id="paycheck-form" class="paycheck-form">
+        <label>Next payday<input id="next-payday" type="date" required></label>
+        <button class="light-button" type="submit">Save Payday</button>
+      </form>
+      <div id="paycheck-summary" class="paycheck-summary">
+        <div><span>Pay schedule</span><strong id="pay-frequency">Not set</strong></div>
+        <div><span>Estimated check</span><strong id="paycheck-amount">—</strong></div>
+        <div><span>Checks this month</span><strong id="paycheck-count">0</strong></div>
+      </div>
+      <p id="paycheck-status" class="plain-note">Set your income and pay schedule on My Money first.</p>
+      <a class="small-inline-link" href="/money">Update income details →</a>
+    </aside>
+  </section>
 
-<section class="panel ai-panel" style="margin-top: 16px;">
-  <p class="label">AI CALENDAR PLANNING</p>
-  <h2>Plan around your real dates.</h2>
-  <p>After Nemotron is connected, it can use your dates to suggest a spending plan before each bill or payday.</p>
-  <a class="light-button" href="/nemotron">Ask AI Coach</a>
-</section>
+  <section id="calendar-setup" class="panel calendar-form-panel">
+    <div class="section-heading"><div><p class="step-number">+</p><div><h2>Add a financial date</h2><p>For one-time bills, deposits, transfers, or reminders.</p></div></div></div>
+    <form id="calendar-event-form" class="calendar-event-form">
+      <label>Title<input id="event-title" maxlength="80" placeholder="Car insurance" required></label>
+      <label>Date<input id="event-date" type="date" required></label>
+      <label>Amount<input id="event-amount" type="number" min="0" step="0.01" placeholder="0.00"></label>
+      <label>Type<select id="event-type"><option value="bill">Expense</option><option value="payday">Income</option><option value="goal">Savings goal</option></select></label>
+      <button class="primary-button" type="submit">Add to Calendar</button>
+    </form>
+    <p id="event-status" class="plain-note">Dates are saved only in this browser.</p>
+  </section>
+
+  <section class="calendar-bottom-grid">
+    <article class="panel ai-calendar-panel">
+      <div class="ai-calendar-heading"><div><p class="label">NEMOTRON CALENDAR PLANNER</p><h2>Turn suggestions into a schedule</h2></div><span class="ai-orbit" aria-hidden="true">✦</span></div>
+      <p>Nemotron reviews the verified cash-flow calculation, chooses the most important next step, and adds an educational action beside each paycheck.</p>
+      <button id="build-ai-calendar" class="primary-button" type="button">Build My AI Schedule</button>
+      <p id="ai-calendar-status" class="plain-note">Requires saved income and a primary goal.</p>
+      <div id="ai-paycheck-allocation" class="ai-paycheck-allocation" hidden>
+        <p class="label">SUGGESTED PER PAYCHECK</p>
+        <div><span>Estimated take-home</span><strong id="allocation-take-home">—</strong></div>
+        <div><span>Set aside for monthly costs</span><strong id="allocation-costs">—</strong></div>
+        <div><span>Goal / emergency fund</span><strong id="allocation-goal">—</strong></div>
+        <div><span>Long-term investing</span><strong id="allocation-investing">—</strong></div>
+      </div>
+      <ol id="ai-calendar-priorities" class="ai-calendar-priorities"></ol>
+    </article>
+    <article class="panel upcoming-panel">
+      <p class="label">UPCOMING</p><h2>Your next money dates</h2><div id="upcoming-events" class="upcoming-events"></div>
+    </article>
+  </section>
+</div>
+
+<script>
+  const CALENDAR_KEY = "lifepath_calendar_v2";
+  const MONEY_KEY = "lifepath_money";
+  const SUBSCRIPTION_KEY = "lifepath_subscriptions_v1";
+  const GOAL_KEY = "lifepath_goal";
+  const calendarState = loadCalendar();
+  let visibleMonth = new Date();
+  visibleMonth = new Date(visibleMonth.getFullYear(), visibleMonth.getMonth(), 1, 12);
+
+  function loadCalendar() {
+    try {
+      const saved = JSON.parse(localStorage.getItem(CALENDAR_KEY) || "{}");
+      return { manualEvents: Array.isArray(saved.manualEvents) ? saved.manualEvents : [], paycheck: saved.paycheck || {}, aiPlan: saved.aiPlan || null };
+    } catch { return { manualEvents: [], paycheck: {}, aiPlan: null }; }
+  }
+  function saveCalendar() { localStorage.setItem(CALENDAR_KEY, JSON.stringify(calendarState)); }
+  function loadJson(key, fallback) { try { return JSON.parse(localStorage.getItem(key) || JSON.stringify(fallback)); } catch { return fallback; } }
+  function localDate(value) { return new Date(`${value}T12:00:00`); }
+  function dateKey(date) { return `${date.getFullYear()}-${String(date.getMonth() + 1).padStart(2, "0")}-${String(date.getDate()).padStart(2, "0")}`; }
+  function newId() { return crypto.randomUUID ? crypto.randomUUID() : `${Date.now()}-${Math.random()}`; }
+  function money(value, digits = 0) { return new Intl.NumberFormat("en-US", { style: "currency", currency: "USD", maximumFractionDigits: digits }).format(Number(value) || 0); }
+  function monthName(date) { return date.toLocaleDateString("en-US", { month: "long", year: "numeric" }); }
+  function monthlySubscriptionCost(item) { const cost = Number(item.cost || 0); return item.frequency === "weekly" ? cost * 52 / 12 : item.frequency === "quarterly" ? cost / 3 : item.frequency === "yearly" ? cost / 12 : cost; }
+
+  function financialContext() {
+    const moneyData = loadJson(MONEY_KEY, { income: {}, expenses: [] });
+    const subscriptions = loadJson(SUBSCRIPTION_KEY, []); const goal = loadJson(GOAL_KEY, null);
+    const gross = Number(moneyData.income?.gross_income || 0);
+    const taxRate = Number(moneyData.income?.income_tax_rate || 0) + Number(moneyData.income?.payroll_tax_rate || 0);
+    const monthlyIncome = Math.max(0, gross * (1 - Math.min(taxRate, 95) / 100));
+    const expenseTotal = (moneyData.expenses || []).reduce((sum, item) => sum + Number(item.amount || 0), 0);
+    const subscriptionTotal = subscriptions.reduce((sum, item) => sum + monthlySubscriptionCost(item), 0);
+    return { moneyData, subscriptions, goal, monthlyIncome, expenseTotal, subscriptionTotal, surplus: monthlyIncome - expenseTotal - subscriptionTotal };
+  }
+
+  function scheduleLabel(schedule) { return { weekly: "Weekly", biweekly: "Every two weeks", monthly: "Monthly" }[schedule] || "Not set"; }
+  function checksPerYear(schedule) { return schedule === "weekly" ? 52 : schedule === "biweekly" ? 26 : schedule === "monthly" ? 12 : 0; }
+  function addMonthsSafe(date, amount) { const day = date.getDate(); const next = new Date(date.getFullYear(), date.getMonth() + amount, 1, 12); next.setDate(Math.min(day, new Date(next.getFullYear(), next.getMonth() + 1, 0).getDate())); return next; }
+
+  function paycheckDatesForMonth(month, schedule, nextDate) {
+    if (!schedule || !nextDate) return [];
+    const start = new Date(month.getFullYear(), month.getMonth(), 1, 12); const end = new Date(month.getFullYear(), month.getMonth() + 1, 0, 12);
+    let cursor = localDate(nextDate);
+    const move = (date, direction) => schedule === "monthly" ? addMonthsSafe(date, direction) : new Date(date.getFullYear(), date.getMonth(), date.getDate() + direction * (schedule === "weekly" ? 7 : 14), 12);
+    while (cursor > start) cursor = move(cursor, -1);
+    while (cursor < start) cursor = move(cursor, 1);
+    const dates = []; let guard = 0;
+    while (cursor <= end && guard < 6) { dates.push(new Date(cursor)); cursor = move(cursor, 1); guard += 1; }
+    return dates;
+  }
+
+  function recurringEventsForMonth(month) {
+    const context = financialContext(); const lastDay = new Date(month.getFullYear(), month.getMonth() + 1, 0).getDate(); const events = [];
+    (context.moneyData.expenses || []).forEach((expense) => {
+      const day = Math.min(Number(expense.due_day || 1), lastDay);
+      events.push({ id: `expense-${expense.name}-${day}`, title: expense.name, date: dateKey(new Date(month.getFullYear(), month.getMonth(), day, 12)), amount: Number(expense.amount || 0), type: "bill", source: expense.due_day ? "Monthly expense" : "Monthly expense · estimated date" });
+    });
+    context.subscriptions.forEach((item) => {
+      let renewal = localDate(item.renewal); let guard = 0; const monthStart = new Date(month.getFullYear(), month.getMonth(), 1, 12);
+      while (renewal < monthStart && guard < 80) { if (item.frequency === "weekly") renewal.setDate(renewal.getDate() + 7); else if (item.frequency === "monthly") renewal = addMonthsSafe(renewal, 1); else if (item.frequency === "quarterly") renewal = addMonthsSafe(renewal, 3); else renewal = addMonthsSafe(renewal, 12); guard += 1; }
+      while (renewal.getFullYear() === month.getFullYear() && renewal.getMonth() === month.getMonth()) {
+        events.push({ id: `subscription-${item.id}-${dateKey(renewal)}`, title: item.name, date: dateKey(renewal), amount: Number(item.cost || 0), type: "subscription", source: "Subscription renewal" });
+        if (item.frequency === "weekly") renewal = new Date(renewal.getFullYear(), renewal.getMonth(), renewal.getDate() + 7, 12); else break;
+      }
+    });
+    const schedule = context.moneyData.income?.pay_schedule; const checks = paycheckDatesForMonth(month, schedule, calendarState.paycheck.nextDate);
+    const amount = checksPerYear(schedule) ? context.monthlyIncome * 12 / checksPerYear(schedule) : 0;
+    checks.forEach((date, index) => {
+      events.push({ id: `paycheck-${dateKey(date)}`, title: "Paycheck", date: dateKey(date), amount, type: "payday", source: "Estimated take-home pay" });
+      if (calendarState.aiPlan?.events) { const template = calendarState.aiPlan.events[index % calendarState.aiPlan.events.length]; if (template) events.push({ ...template, id: `ai-${dateKey(date)}`, date: dateKey(date), type: "ai", source: `${calendarState.aiPlan.generatedBy} suggestion` }); }
+    });
+    return events;
+  }
+
+  function eventsForMonth(month) {
+    return [...recurringEventsForMonth(month), ...calendarState.manualEvents.filter(item => { const date = localDate(item.date); return date.getFullYear() === month.getFullYear() && date.getMonth() === month.getMonth(); })].sort((a, b) => a.date.localeCompare(b.date));
+  }
+
+  function eventPill(event) {
+    const pill = document.createElement("div"); pill.className = `calendar-event ${event.type}`; pill.title = `${event.title}${event.amount ? ` · ${money(event.amount, 2)}` : ""} · ${event.detail || event.source || "Saved date"}`;
+    const dot = document.createElement("i"); const title = document.createElement("span"); title.textContent = event.title; pill.append(dot, title);
+    if (event.amount) { const amount = document.createElement("b"); amount.textContent = money(event.amount); pill.appendChild(amount); }
+    return pill;
+  }
+
+  function renderCalendar() {
+    const grid = document.getElementById("calendar-grid"); const monthEvents = eventsForMonth(visibleMonth); document.getElementById("calendar-month").textContent = monthName(visibleMonth);
+    const firstDay = new Date(visibleMonth.getFullYear(), visibleMonth.getMonth(), 1, 12); const gridStart = new Date(firstDay); gridStart.setDate(1 - firstDay.getDay()); const todayKey = dateKey(new Date()); const cells = [];
+    for (let index = 0; index < 42; index += 1) {
+      const date = new Date(gridStart); date.setDate(gridStart.getDate() + index); const key = dateKey(date); const cell = document.createElement("div");
+      cell.className = `calendar-day${date.getMonth() !== visibleMonth.getMonth() ? " outside-month" : ""}${key === todayKey ? " today" : ""}`;
+      const number = document.createElement("span"); number.className = "calendar-day-number"; number.textContent = date.getDate(); cell.appendChild(number);
+      const dayEvents = monthEvents.filter(event => event.date === key); dayEvents.slice(0, 3).forEach(event => cell.appendChild(eventPill(event)));
+      if (dayEvents.length > 3) { const more = document.createElement("small"); more.textContent = `+${dayEvents.length - 3} more`; cell.appendChild(more); } cells.push(cell);
+    }
+    grid.replaceChildren(...cells); renderSummary(); renderUpcoming();
+  }
+
+  function renderSummary() {
+    const context = financialContext(); const schedule = context.moneyData.income?.pay_schedule; const checks = paycheckDatesForMonth(visibleMonth, schedule, calendarState.paycheck.nextDate); const checkAmount = checksPerYear(schedule) ? context.monthlyIncome * 12 / checksPerYear(schedule) : 0;
+    document.getElementById("calendar-income").textContent = money(context.monthlyIncome); document.getElementById("calendar-expenses").textContent = money(context.expenseTotal); document.getElementById("calendar-subscriptions").textContent = money(context.subscriptionTotal); document.getElementById("calendar-leftover").textContent = money(context.surplus); document.getElementById("calendar-leftover").className = context.surplus >= 0 ? "positive-text" : "negative-text";
+    document.getElementById("pay-frequency").textContent = scheduleLabel(schedule); document.getElementById("paycheck-amount").textContent = checkAmount ? money(checkAmount, 2) : "—"; document.getElementById("paycheck-count").textContent = checks.length; if (calendarState.paycheck.nextDate) document.getElementById("next-payday").value = calendarState.paycheck.nextDate;
+    const paycheckStatus = document.getElementById("paycheck-status");
+    if (!context.moneyData.income?.gross_income || !schedule) paycheckStatus.textContent = "Set your income and pay schedule on My Money first.";
+    else if (!calendarState.paycheck.nextDate) paycheckStatus.textContent = "Choose your next payday to place every check on the calendar.";
+    else paycheckStatus.textContent = `${checks.length} estimated paycheck${checks.length === 1 ? "" : "s"} shown for ${monthName(visibleMonth)}.`;
+  }
+
+  function allUpcomingEvents() {
+    const now = new Date(); now.setHours(12, 0, 0, 0); const events = [];
+    for (let offset = 0; offset < 3; offset += 1) events.push(...eventsForMonth(new Date(now.getFullYear(), now.getMonth() + offset, 1, 12)));
+    return events.filter(event => localDate(event.date) >= now).sort((a, b) => a.date.localeCompare(b.date)).slice(0, 8);
+  }
+
+  function renderUpcoming() {
+    const container = document.getElementById("upcoming-events"); const upcoming = allUpcomingEvents();
+    if (!upcoming.length) { const empty = document.createElement("p"); empty.className = "plain-note"; empty.textContent = "Add a payday or financial date to begin."; container.replaceChildren(empty); return; }
+    container.replaceChildren(...upcoming.map(event => {
+      const row = document.createElement("div"); row.className = "upcoming-row"; const date = document.createElement("time"); date.dateTime = event.date; const day = document.createElement("strong"); day.textContent = localDate(event.date).toLocaleDateString("en-US", { day: "numeric" }); const month = document.createElement("span"); month.textContent = localDate(event.date).toLocaleDateString("en-US", { month: "short" }); date.append(day, month);
+      const info = document.createElement("div"); const title = document.createElement("strong"); title.textContent = event.title; const source = document.createElement("span"); source.textContent = `${event.source || "Saved date"}${event.amount ? ` · ${money(event.amount, 2)}` : ""}`; info.append(title, source); row.append(date, info);
+      if (calendarState.manualEvents.some(item => item.id === event.id)) { const remove = document.createElement("button"); remove.type = "button"; remove.textContent = "Remove"; remove.addEventListener("click", () => { calendarState.manualEvents = calendarState.manualEvents.filter(item => item.id !== event.id); saveCalendar(); renderCalendar(); }); row.appendChild(remove); } return row;
+    }));
+  }
+
+  function buildProfile(context) {
+    const expenses = (context.moneyData.expenses || []).map(item => ({ name: item.name, amount: Number(item.amount || 0), essential: Boolean(item.essential) })); const subscriptions = context.subscriptions.map(item => ({ name: `${item.name} subscription`, amount: monthlySubscriptionCost(item), essential: false }));
+    return { income: { monthly: Math.max(1, context.monthlyIncome) }, fixed_expenses: expenses.filter(item => item.essential), flexible_expenses: [...expenses.filter(item => !item.essential), ...subscriptions], emergency_savings: Number(context.moneyData.income?.emergency_savings || 0), investments: [], debts: [], goal: { name: context.goal.goal_name, target_amount: Number(context.goal.target_amount), current_amount: Number(context.goal.current_amount), target_date: context.goal.target_date }, risk_comfort: context.goal.risk_comfort, monthly_goal_contribution: Number(context.goal.monthly_contribution || 0) };
+  }
+
+  async function buildAiSchedule() {
+    const status = document.getElementById("ai-calendar-status"); const context = financialContext();
+    if (!context.moneyData.income?.gross_income) { status.textContent = "Add income and a pay schedule on My Money first."; return; }
+    if (!calendarState.paycheck.nextDate) { status.textContent = "Save your next payday first."; return; }
+    if (!context.goal?.goal_name) { status.textContent = "Add a primary goal before generating an AI schedule."; return; }
+    status.textContent = "Calculating cash flow and asking Nemotron…";
+    try {
+      const response = await fetch("/api/v1/plan", { method: "POST", headers: { "Content-Type": "application/json" }, body: JSON.stringify(buildProfile(context)) }); const data = await response.json(); if (!response.ok) throw new Error("The AI schedule could not be generated.");
+      const schedule = context.moneyData.income.pay_schedule; const typicalChecks = schedule === "weekly" ? 4.33 : schedule === "biweekly" ? 2.17 : 1; const safeMonthly = Math.max(0, data.analysis.cash_flow.monthly_surplus); const requestedGoal = Number(context.goal.monthly_contribution || 0); const goalPerCheck = Math.min(requestedGoal, safeMonthly) / typicalChecks; const remainingPerCheck = Math.max(0, safeMonthly / typicalChecks - goalPerCheck); const obstacle = data.coach.primary_obstacle;
+      let actionTitle = data.coach.priorities[0]?.title || "Review your money plan"; let actionAmount = goalPerCheck; let detail = `${money(goalPerCheck, 2)} toward ${context.goal.goal_name}`;
+      let emergencyPerCheck = 0; let investingPerCheck = 0;
+      if (obstacle === "emergency_fund_gap") { emergencyPerCheck = remainingPerCheck * .8; actionAmount = goalPerCheck + emergencyPerCheck; detail = `${money(actionAmount, 2)} toward your goal and emergency cushion`; }
+      else if (obstacle === "negative_cash_flow") { actionAmount = 0; detail = "Pause new investing and review expenses before allocating this check"; }
+      else if (remainingPerCheck > 0) { investingPerCheck = remainingPerCheck * .5; actionAmount = goalPerCheck + investingPerCheck; detail = `${money(goalPerCheck, 2)} to your goal; up to ${money(investingPerCheck, 2)} for a diversified long-term investment bucket after essentials`; }
+      calendarState.aiPlan = {
+        generatedBy: data.coach.generated_by, generatedAt: new Date().toISOString(), summary: data.coach.summary, priorities: data.coach.priorities,
+        allocation: { takeHome: context.monthlyIncome / typicalChecks, costs: (context.expenseTotal + context.subscriptionTotal) / typicalChecks, goal: goalPerCheck + emergencyPerCheck, investing: investingPerCheck },
+        events: [{ title: `AI: ${actionTitle}`, amount: actionAmount, detail }],
+      };
+      saveCalendar(); renderCalendar(); renderAiPlan(); status.textContent = `Calendar updated from ${data.coach.generated_by === "nemotron" ? "Nemotron" : "the safe offline coach"}. Suggestions are educational, not investment advice.`;
+    } catch (error) { status.textContent = error.message; }
+  }
+
+  function renderAiPlan() {
+    const list = document.getElementById("ai-calendar-priorities"); const allocation = document.getElementById("ai-paycheck-allocation");
+    if (!calendarState.aiPlan) { list.replaceChildren(); allocation.hidden = true; return; }
+    if (calendarState.aiPlan.allocation) {
+      document.getElementById("allocation-take-home").textContent = money(calendarState.aiPlan.allocation.takeHome, 2);
+      document.getElementById("allocation-costs").textContent = money(calendarState.aiPlan.allocation.costs, 2);
+      document.getElementById("allocation-goal").textContent = money(calendarState.aiPlan.allocation.goal, 2);
+      document.getElementById("allocation-investing").textContent = calendarState.aiPlan.allocation.investing > 0 ? money(calendarState.aiPlan.allocation.investing, 2) : "Wait for now";
+      allocation.hidden = false;
+    }
+    list.replaceChildren(...calendarState.aiPlan.priorities.map(item => { const entry = document.createElement("li"); const title = document.createElement("strong"); title.textContent = item.title; const reason = document.createElement("span"); reason.textContent = item.reason; entry.append(title, reason); return entry; }));
+  }
+
+  document.getElementById("previous-month").addEventListener("click", () => { visibleMonth = addMonthsSafe(visibleMonth, -1); renderCalendar(); });
+  document.getElementById("next-month").addEventListener("click", () => { visibleMonth = addMonthsSafe(visibleMonth, 1); renderCalendar(); });
+  document.getElementById("today-month").addEventListener("click", () => { const today = new Date(); visibleMonth = new Date(today.getFullYear(), today.getMonth(), 1, 12); renderCalendar(); });
+  document.getElementById("paycheck-form").addEventListener("submit", event => { event.preventDefault(); calendarState.paycheck.nextDate = document.getElementById("next-payday").value; saveCalendar(); document.getElementById("paycheck-status").textContent = "Paydays added using your saved schedule."; renderCalendar(); });
+  document.getElementById("calendar-event-form").addEventListener("submit", event => {
+    event.preventDefault(); const selectedDate = document.getElementById("event-date").value; calendarState.manualEvents.push({ id: newId(), title: document.getElementById("event-title").value.trim(), date: selectedDate, amount: Number(document.getElementById("event-amount").value || 0), type: document.getElementById("event-type").value, source: "Manually added" });
+    saveCalendar(); const eventDate = localDate(selectedDate); visibleMonth = new Date(eventDate.getFullYear(), eventDate.getMonth(), 1, 12); event.currentTarget.reset(); document.getElementById("event-date").value = dateKey(new Date()); document.getElementById("event-status").textContent = "Financial date added."; renderCalendar();
+  });
+  document.getElementById("build-ai-calendar").addEventListener("click", buildAiSchedule);
+  document.getElementById("event-date").value = dateKey(new Date());
+  document.getElementById("next-payday").min = dateKey(new Date(new Date().getFullYear(), new Date().getMonth() - 2, 1));
+  renderCalendar(); renderAiPlan();
+</script>
 {% endblock %}

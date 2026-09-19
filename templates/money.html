@@ -85,6 +85,11 @@
       <input name="expense_amount" type="number" min="0" step="0.01" placeholder="Enter amount" required>
     </p>
 
+    <p>
+      <label>Usually due on</label><br>
+      <input name="expense_due_day" type="number" min="1" max="28" step="1" placeholder="Day of month (optional)">
+    </p>
+
     <button class="primary-button" type="submit">Add Expense</button>
   </form>
 </section>
@@ -108,7 +113,7 @@
       const row = document.createElement("div");
       row.className = "spending-row";
       const label = document.createElement("span");
-      label.textContent = `${expense.name} (${expense.category})`;
+      label.textContent = `${expense.name} (${expense.category})${expense.due_day ? ` · due day ${expense.due_day}` : ""}`;
       const amount = document.createElement("strong");
       amount.textContent = `$${Number(expense.amount).toFixed(2)}`;
       const remove = document.createElement("button");
@@ -145,6 +150,7 @@
       name: values.expense_name,
       category: values.expense_category,
       amount: Number(values.expense_amount),
+      due_day: values.expense_due_day ? Number(values.expense_due_day) : null,
       essential: ["Housing", "Food", "Utilities", "Transportation", "Debt"].includes(values.expense_category),
     });
     localStorage.setItem(MONEY_KEY, JSON.stringify(money));

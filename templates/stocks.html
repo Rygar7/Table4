@@ -64,7 +64,7 @@
       <div id="chart-empty" class="chart-empty"><span>⌁</span><p>Search a symbol to draw its recent price history.</p></div>
     </div>
     <div id="chart-axis" class="chart-axis"><span id="axis-start">90 market days ago</span><span>Latest market day</span></div>
-    <p id="drag-hint" class="drag-hint" hidden>Drag across the graph to inspect each closing price.</p>
+    <p id="drag-hint" class="drag-hint" hidden>Move anywhere across the graph to inspect the market day at that horizontal position.</p>
     <p id="quote-status" class="chart-caption">Prices come from Alpaca’s IEX market feed and may be delayed.</p>
   </article>
 
@@ -188,10 +188,6 @@
     const index = Math.round(ratio * (chartState.closes.length - 1));
     const pointX = chartState.x(index); const pointY = chartState.y(chartState.closes[index]);
     const pointScreenY = pointY / chartState.height * rect.height;
-    const distanceFromLine = Math.abs((event.clientY - rect.top) - pointScreenY);
-    if (event.pointerType === "mouse" && distanceFromLine > 18) {
-      hideChartInspection(); return;
-    }
     const cursor = document.getElementById("chart-cursor");
     const cursorLine = cursor.querySelector("line"); const cursorPoint = cursor.querySelector("circle");
     cursorLine.setAttribute("x1", pointX); cursorLine.setAttribute("x2", pointX);

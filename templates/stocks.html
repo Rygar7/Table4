@@ -1,55 +1,83 @@
 {% extends "base.html" %}
 
 {% block content %}
-<section class="welcome">
+<section class="welcome market-hero">
   <div>
     <p class="label">MARKET WATCH</p>
-    <h1>Research before you invest.</h1>
-    <p>Track symbols and research notes once you connect a market-data source.</p>
+    <h1>See the movement.<br><span class="gradient-text">Understand the risk.</span></h1>
+    <p>Turn recent market prices into a clear visual—not a prediction.</p>
   </div>
 
-  <form id="stock-search" style="display: flex; gap: 8px; align-items: center;">
+  <form id="stock-search" class="stock-search">
     <input
       id="stock-symbol"
       aria-label="Stock symbol"
       maxlength="10"
       placeholder="AAPL"
       required
-      style="padding: 12px; text-transform: uppercase;"
     >
     <button class="primary-button" type="submit">Check Stock</button>
   </form>
 </section>
 
-<section class="panel">
-  <p class="label">LIVE MARKET LOOKUP</p>
-  <h2 id="quote-heading">Enter a stock symbol</h2>
-  <p id="quote-status">Try AAPL, NVDA, TSLA, or MSFT.</p>
+<div class="quick-symbols" aria-label="Popular symbols">
+  <span>Try:</span>
+  <button type="button" data-symbol="AAPL">AAPL</button>
+  <button type="button" data-symbol="NVDA">NVDA</button>
+  <button type="button" data-symbol="MSFT">MSFT</button>
+  <button type="button" data-symbol="TSLA">TSLA</button>
+</div>
 
-  <div id="quote-result" class="money-cards" hidden>
-    <article class="card">
+<section class="market-layout">
+  <article class="panel chart-panel">
+    <div class="chart-heading">
+      <div>
+        <p class="label">90-DAY PRICE HISTORY</p>
+        <h2 id="quote-heading">Choose a stock to begin</h2>
+      </div>
+      <div id="trend-badge" class="trend-badge neutral">Waiting for a symbol</div>
+    </div>
+    <div id="chart-wrap" class="chart-wrap empty-chart">
+      <svg id="stock-chart" viewBox="0 0 760 280" role="img" aria-label="Historical closing-price chart">
+        <defs>
+          <linearGradient id="chart-fill-up" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="#41e6d3" stop-opacity=".42"/><stop offset="1" stop-color="#41e6d3" stop-opacity="0"/></linearGradient>
+          <linearGradient id="chart-fill-down" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="#ff6f91" stop-opacity=".40"/><stop offset="1" stop-color="#ff6f91" stop-opacity="0"/></linearGradient>
+        </defs>
+        <g id="chart-grid"></g><path id="chart-area"></path><path id="chart-line"></path><g id="chart-points"></g>
+      </svg>
+      <div id="chart-empty" class="chart-empty"><span>⌁</span><p>Search a symbol to draw its recent price history.</p></div>
+    </div>
+    <div id="chart-axis" class="chart-axis"><span>90 days ago</span><span>Latest market day</span></div>
+    <p id="quote-status" class="chart-caption">Prices come from Alpaca’s IEX market feed and may be delayed.</p>
+  </article>
+
+  <aside id="quote-result" class="quote-sidebar" hidden>
+    <article class="card accent-cyan price-card">
       <p>Latest price</p>
       <h2 id="quote-price">—</h2>
       <span id="quote-time">—</span>
     </article>
-    <article class="card">
+    <article class="card accent-purple">
       <p>Daily change</p>
       <h2 id="quote-change">—</h2>
       <span id="quote-feed">—</span>
     </article>
-  </div>
+    <div class="mini-stat-grid">
+      <article class="mini-stat high-stat"><span>90-day high</span><strong id="period-high">—</strong></article>
+      <article class="mini-stat low-stat"><span>90-day low</span><strong id="period-low">—</strong></article>
+    </div>
+  </aside>
 </section>
 
 <section class="content-grid" style="margin-top: 16px;">
-  <article class="panel">
+  <article class="panel checklist-panel">
     <p class="label">RESEARCH CHECKLIST</p>
     <h2>Before investing</h2>
-    <ul>
-      <li>Build an emergency fund first.</li>
-      <li>Do not invest money needed for bills.</li>
-      <li>Understand risk and diversification.</li>
-      <li>Research investments from trustworthy sources.</li>
-    </ul>
+    <div class="visual-checklist">
+      <p><span class="check-icon cyan-icon">1</span>Build an emergency fund first.</p>
+      <p><span class="check-icon purple-icon">2</span>Keep bill money out of the market.</p>
+      <p><span class="check-icon orange-icon">3</span>Understand risk and diversification.</p>
+    </div>
   </article>
 
   <article class="panel ai-panel">
@@ -70,6 +98,57 @@
   const insightButton = document.getElementById("ask-nemotron");
   let currentSymbol = "";
 
+  const currency = (value) => new Intl.NumberFormat("en-US", {
+    style: "currency", currency: "USD", maximumFractionDigits: 2,
+  }).format(value);
+
+  function drawChart(bars) {
+    if (!bars.length) throw new Error("No recent price history was returned.");
+    const closes = bars.map(bar => Number(bar.close));
+    const width = 760, height = 280, left = 18, right = 18, top = 20, bottom = 24;
+    const min = Math.min(...closes), max = Math.max(...closes);
+    const padding = Math.max((max - min) * 0.14, max * 0.01);
+    const low = min - padding, high = max + padding;
+    const x = index => left + index / Math.max(closes.length - 1, 1) * (width - left - right);
+    const y = value => top + (high - value) / Math.max(high - low, 1) * (height - top - bottom);
+    const line = closes.map((value, index) => `${index ? "L" : "M"}${x(index).toFixed(1)},${y(value).toFixed(1)}`).join(" ");
+    const isUp = closes.at(-1) >= closes[0];
+    document.getElementById("chart-line").setAttribute("d", line);
+    document.getElementById("chart-line").setAttribute("class", isUp ? "chart-line up" : "chart-line down");
+    const area = `${line} L${x(closes.length - 1).toFixed(1)},${height - bottom} L${left},${height - bottom} Z`;
+    document.getElementById("chart-area").setAttribute("d", area);
+    document.getElementById("chart-area").setAttribute("fill", `url(#chart-fill-${isUp ? "up" : "down"})`);
+    const grid = document.getElementById("chart-grid");
+    grid.replaceChildren(...[0, 1, 2, 3, 4].map(index => {
+      const line = document.createElementNS("http://www.w3.org/2000/svg", "line");
+      const gridY = top + index * (height - top - bottom) / 4;
+      line.setAttribute("x1", left); line.setAttribute("x2", width - right);
+      line.setAttribute("y1", gridY); line.setAttribute("y2", gridY); return line;
+    }));
+    const points = document.getElementById("chart-points");
+    points.replaceChildren(...[0, Math.floor((closes.length - 1) / 2), closes.length - 1].map(index => {
+      const circle = document.createElementNS("http://www.w3.org/2000/svg", "circle");
+      circle.setAttribute("cx", x(index)); circle.setAttribute("cy", y(closes[index]));
+      circle.setAttribute("r", "4"); circle.setAttribute("class", isUp ? "up" : "down");
+      const title = document.createElementNS("http://www.w3.org/2000/svg", "title");
+      title.textContent = `${new Date(bars[index].timestamp).toLocaleDateString()}: ${currency(closes[index])}`;
+      circle.appendChild(title); return circle;
+    }));
+    document.getElementById("period-high").textContent = currency(max);
+    document.getElementById("period-low").textContent = currency(min);
+    document.getElementById("chart-empty").hidden = true;
+    document.getElementById("chart-wrap").classList.remove("empty-chart");
+    const periodChange = (closes.at(-1) / closes[0] - 1) * 100;
+    const badge = document.getElementById("trend-badge");
+    badge.className = `trend-badge ${periodChange >= 0 ? "positive" : "negative"}`;
+    badge.textContent = `${periodChange >= 0 ? "↗" : "↘"} ${Math.abs(periodChange).toFixed(1)}% over shown period`;
+  }
+
+  document.querySelectorAll("[data-symbol]").forEach(button => button.addEventListener("click", () => {
+    symbolInput.value = button.dataset.symbol;
+    form.requestSubmit();
+  }));
+
   form.addEventListener("submit", async (event) => {
     event.preventDefault();
     const symbol = symbolInput.value.trim().toUpperCase();
@@ -79,9 +158,14 @@
     result.hidden = true;
 
     try {
-      const response = await fetch(`/api/v1/stocks/${encodeURIComponent(symbol)}`);
-      const data = await response.json();
-      if (!response.ok) throw new Error(data.detail || "Stock data is unavailable.");
+      const [quoteResponse, historyResponse] = await Promise.all([
+        fetch(`/api/v1/stocks/${encodeURIComponent(symbol)}`),
+        fetch(`/api/v1/stocks/${encodeURIComponent(symbol)}/history?days=90`),
+      ]);
+      const data = await quoteResponse.json();
+      const history = await historyResponse.json();
+      if (!quoteResponse.ok) throw new Error(data.detail || "Stock data is unavailable.");
+      if (!historyResponse.ok) throw new Error(history.detail || "Price history is unavailable.");
 
       document.getElementById("quote-heading").textContent = data.symbol;
       document.getElementById("quote-price").textContent =
@@ -93,6 +177,8 @@
         ? `As of ${new Date(data.as_of).toLocaleString()}`
         : "Latest available price";
       document.getElementById("quote-feed").textContent = `${data.market_feed} market feed`;
+      document.getElementById("quote-change").className = data.change == null ? "" : data.change >= 0 ? "positive-text" : "negative-text";
+      drawChart(history.bars);
       statusText.textContent = data.disclaimer;
       result.hidden = false;
       currentSymbol = data.symbol;

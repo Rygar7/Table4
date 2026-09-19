@@ -11,26 +11,36 @@
   <a class="primary-button" href="/money">Update Budget</a>
 </section>
 
+<section class="visual-banner">
+  <div class="visual-copy">
+    <span class="eyebrow-dot cyan-dot"></span>
+    <div><strong>Your financial picture, in one place</strong><span>Budget · Credit · Goals · Markets</span></div>
+  </div>
+  <div class="mini-bars" aria-label="Decorative financial growth chart">
+    <i style="height: 28%"></i><i style="height: 46%"></i><i style="height: 38%"></i><i style="height: 72%"></i><i style="height: 90%"></i>
+  </div>
+</section>
+
 <section class="money-cards">
-  <article class="card">
+  <article class="card accent-cyan">
     <p>Available This Month</p>
     <h2>{{ available_this_month | default("—", true) }}</h2>
     <span>After income, taxes, and expenses</span>
   </article>
 
-  <article class="card">
+  <article class="card accent-purple">
     <p>Monthly Income</p>
     <h2>{{ monthly_income | default("—", true) }}</h2>
     <span>Your estimated income</span>
   </article>
 
-  <article class="card">
+  <article class="card accent-orange">
     <p>Monthly Expenses</p>
     <h2>{{ monthly_expenses | default("—", true) }}</h2>
     <span>Your saved expense total</span>
   </article>
 
-  <article class="card">
+  <article class="card accent-blue">
     <p>Primary Goal Progress</p>
     <h2>{{ primary_goal_progress | default("—", true) }}</h2>
     <span>{{ primary_goal_name | default("No goal added yet", true) }}</span>

@@ -11,13 +11,13 @@
     <div class="logo">LifePath AI</div>
 
     <nav>
-      <a href="/">Home</a>
-      <a href="/money">My Money</a>
-      <a href="/goals">Goals</a>
-      <a href="/accounts">Accounts &amp; Credit</a>
-      <a href="/stocks">Stocks</a>
-      <a href="/ideas">Suggested Trades</a>
-      <a href="/nemotron">My AI Plan</a>
+      <a href="/" class="{{ 'active' if request.url.path == '/' else '' }}">Home</a>
+      <a href="/money" class="{{ 'active' if request.url.path == '/money' else '' }}">My Money</a>
+      <a href="/goals" class="{{ 'active' if request.url.path == '/goals' else '' }}">Goals</a>
+      <a href="/accounts" class="{{ 'active' if request.url.path == '/accounts' else '' }}">Accounts &amp; Credit</a>
+      <a href="/stocks" class="{{ 'active' if request.url.path == '/stocks' else '' }}">Stocks</a>
+      <a href="/ideas" class="{{ 'active' if request.url.path == '/ideas' else '' }}">Suggested Trades</a>
+      <a href="/nemotron" class="{{ 'active' if request.url.path == '/nemotron' else '' }}">My AI Plan</a>
     </nav>
   </header>
 

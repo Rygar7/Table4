@@ -12,6 +12,8 @@ from .market import (
     calculate_stock_metrics,
     get_market_news,
     get_market_trends,
+    get_instrument_trends,
+    get_news_for_symbols,
     get_stock_history,
     get_stock_quote,
 )
@@ -26,10 +28,13 @@ from .models import (
     StockInsight,
     StockMetrics,
     StockQuote,
+    SuggestedTrades,
+    SuggestionRequest,
 )
 from .market_research import create_market_research
 from .nemotron import create_coach
 from .stock_coach import create_stock_insight
+from .trade_ideas import INSTRUMENTS, candidate_symbols, create_suggested_trades
 
 
 load_dotenv(Path(__file__).resolve().parents[2] / ".env")
@@ -76,6 +81,11 @@ def stocks_page(request: Request):
     return templates.TemplateResponse(request=request, name="stocks.html")
 
 
+@app.get("/ideas", include_in_schema=False)
+def ideas_page(request: Request):
+    return templates.TemplateResponse(request=request, name="ideas.html")
+
+
 @app.get("/nemotron", include_in_schema=False)
 def nemotron_page(request: Request):
     return templates.TemplateResponse(request=request, name="nemotron.html")
@@ -110,6 +120,25 @@ def market_research() -> MarketResearch:
         trends = [MarketTrend.model_validate(item) for item in get_market_trends()]
         news = [MarketNewsItem.model_validate(item) for item in get_market_news()]
         return create_market_research(trends, news)
+    except MarketDataError as exc:
+        raise HTTPException(status_code=502, detail=str(exc)) from exc
+
+
+@app.post("/api/v1/market/suggestions", response_model=SuggestedTrades)
+def market_suggestions(request: SuggestionRequest) -> SuggestedTrades:
+    try:
+        symbols = candidate_symbols(request)
+        trends = [
+            MarketTrend.model_validate(item)
+            for item in get_instrument_trends(
+                {symbol: INSTRUMENTS[symbol][0] for symbol in symbols}
+            )
+        ]
+        news = [
+            MarketNewsItem.model_validate(item)
+            for item in get_news_for_symbols(symbols)
+        ]
+        return create_suggested_trades(request, trends, news)
     except MarketDataError as exc:
         raise HTTPException(status_code=502, detail=str(exc)) from exc
 

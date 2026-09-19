@@ -453,6 +453,132 @@ li {
   margin: 10px 0;
 }
 
+.simple-shell {
+  max-width: 900px;
+  margin: 0 auto;
+}
+
+.compact-welcome {
+  margin-bottom: 22px;
+}
+
+.compact-welcome h1 {
+  font-size: clamp(34px, 5vw, 50px);
+}
+
+.step-card {
+  display: grid;
+  grid-template-columns: 42px 1fr minmax(220px, 300px);
+  align-items: center;
+  gap: 18px;
+  margin-bottom: 12px;
+  padding: 18px 20px;
+}
+
+.step-card h2,
+.step-card select {
+  margin: 0;
+}
+
+.step-number,
+.idea-number {
+  display: grid;
+  place-items: center;
+  width: 34px;
+  height: 34px;
+  margin: 0;
+  color: #031007;
+  font-weight: 700;
+  background: var(--green);
+  border-radius: 50%;
+}
+
+.large-action {
+  width: 100%;
+  margin-top: 8px;
+  padding: 15px 20px;
+  text-align: center;
+}
+
+.plain-note {
+  color: var(--muted);
+  font-size: 13px;
+  text-align: center;
+}
+
+.result-heading {
+  margin: 38px 0 18px;
+  text-align: center;
+}
+
+.idea-grid {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 16px;
+}
+
+.idea-card {
+  padding: 22px;
+  background: rgba(11, 28, 17, 0.9);
+  border: 1px solid var(--line);
+  border-radius: 14px;
+}
+
+.idea-card h2 {
+  margin-top: 18px;
+}
+
+.idea-card p {
+  color: #c8d8cd;
+  line-height: 1.55;
+}
+
+.idea-top {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 10px;
+}
+
+.simple-badge {
+  padding: 6px 9px;
+  color: var(--green-light);
+  font-size: 11px;
+  background: rgba(85, 242, 138, 0.1);
+  border: 1px solid var(--line-bright);
+  border-radius: 99px;
+}
+
+.next-step {
+  padding: 12px;
+  background: rgba(85, 242, 138, 0.08);
+  border-radius: 8px;
+}
+
+details {
+  margin-top: 14px;
+  color: var(--green-light);
+}
+
+details summary {
+  cursor: pointer;
+}
+
+details a {
+  display: block;
+  margin-top: 10px;
+  color: var(--green-light);
+  font-size: 13px;
+}
+
+.sources-checked {
+  max-width: 620px;
+  margin: 18px auto;
+  padding: 14px 16px;
+  background: rgba(85, 242, 138, 0.06);
+  border-radius: 10px;
+}
+
 @media (max-width: 850px) {
   header {
     gap: 16px;
@@ -477,8 +603,17 @@ li {
   }
 
   .money-cards,
-  .content-grid {
+  .content-grid,
+  .idea-grid {
     grid-template-columns: 1fr;
+  }
+
+  .step-card {
+    grid-template-columns: 42px 1fr;
+  }
+
+  .step-card select {
+    grid-column: 1 / -1;
   }
 }
 

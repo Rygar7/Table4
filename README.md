@@ -26,8 +26,11 @@ Open `http://127.0.0.1:8000/docs` for the interactive API documentation.
 - `GET /api/v1/stocks/{symbol}/insight` calculates recent risk metrics and asks Nemotron to explain them.
 - `GET /api/v1/market/research` combines broad-market trends, current Alpaca news,
   sourced portfolio examples, and Nemotron-generated research ideas.
+- `POST /api/v1/market/suggestions` returns a three-item beginner research shortlist
+  based on time horizon, risk comfort, verified trends, and current sourced news.
 
 Open `http://127.0.0.1:8000/stocks` to use the connected stock lookup page.
+Open `http://127.0.0.1:8000/ideas` for the simplified Suggested Trades experience.
 The Money and Goals pages save prototype data in the browser, and the AI Coach page sends
 that structured profile to the planning endpoint.
 

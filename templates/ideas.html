@@ -1,0 +1,138 @@
+{% extends "base.html" %}
+
+{% block content %}
+<div class="simple-shell">
+  <section class="welcome compact-welcome">
+    <div>
+      <p class="label">BEGINNER MODE</p>
+      <h1>Three ideas to research.</h1>
+      <p>Answer two simple questions. Nemotron checks recent trends and current news, then builds a short practice watchlist.</p>
+    </div>
+  </section>
+
+  <section class="panel step-card">
+    <p class="step-number">1</p>
+    <h2>When might you need this money?</h2>
+    <select id="time-horizon">
+      <option value="under_3_years">Within 3 years</option>
+      <option value="3_to_7_years" selected>In 3–7 years</option>
+      <option value="over_7_years">More than 7 years</option>
+    </select>
+  </section>
+
+  <section class="panel step-card">
+    <p class="step-number">2</p>
+    <h2>How would a temporary loss feel?</h2>
+    <select id="risk-comfort">
+      <option value="cautious">Very uncomfortable</option>
+      <option value="balanced" selected>I could handle a moderate drop</option>
+      <option value="growth">I understand large drops can happen</option>
+    </select>
+  </section>
+
+  <button id="build-list" class="primary-button large-action" type="button">Build My Research List</button>
+  <p id="ideas-status" class="plain-note">No real trades are placed.</p>
+
+  <section id="ideas-result" hidden>
+    <div class="result-heading">
+      <p class="label">NEMOTRON SHORTLIST</p>
+      <h2 id="beginner-summary"></h2>
+    </div>
+    <div id="idea-cards" class="idea-grid"></div>
+    <details id="news-checked" class="sources-checked">
+      <summary>News sources checked</summary>
+    </details>
+    <p id="ideas-disclaimer" class="plain-note"></p>
+  </section>
+</div>
+
+<script>
+  document.getElementById("build-list").addEventListener("click", async (event) => {
+    const button = event.currentTarget;
+    const status = document.getElementById("ideas-status");
+    button.disabled = true;
+    status.textContent = "Checking recent prices and current news…";
+    try {
+      const response = await fetch("/api/v1/market/suggestions", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({
+          time_horizon: document.getElementById("time-horizon").value,
+          risk_comfort: document.getElementById("risk-comfort").value,
+        }),
+      });
+      const data = await response.json();
+      if (!response.ok) throw new Error(data.detail || "The research list is unavailable.");
+
+      document.getElementById("beginner-summary").textContent = data.beginner_summary;
+      const cards = document.getElementById("idea-cards");
+      cards.replaceChildren(...data.ideas.map((idea, index) => {
+        const card = document.createElement("article");
+        card.className = "idea-card";
+
+        const top = document.createElement("div");
+        top.className = "idea-top";
+        const number = document.createElement("span");
+        number.className = "idea-number";
+        number.textContent = String(index + 1);
+        const type = document.createElement("span");
+        type.className = "simple-badge";
+        type.textContent = idea.instrument_type;
+        top.append(number, type);
+
+        const title = document.createElement("h2");
+        title.textContent = `${idea.symbol} · ${idea.name}`;
+        const reason = document.createElement("p");
+        reason.textContent = idea.why_it_appeared;
+
+        const riskLabel = document.createElement("strong");
+        riskLabel.textContent = "Main risk";
+        const risk = document.createElement("p");
+        risk.textContent = idea.main_risk;
+
+        const next = document.createElement("p");
+        next.className = "next-step";
+        next.textContent = `Next: ${idea.next_step}`;
+        card.append(top, title, reason, riskLabel, risk, next);
+
+        if (idea.related_news.length) {
+          const details = document.createElement("details");
+          const summary = document.createElement("summary");
+          summary.textContent = "View related news sources";
+          details.appendChild(summary);
+          idea.related_news.forEach((article) => {
+            const link = document.createElement("a");
+            link.href = article.url;
+            link.target = "_blank";
+            link.rel = "noopener noreferrer";
+            link.textContent = article.headline;
+            details.appendChild(link);
+          });
+          card.appendChild(details);
+        }
+        return card;
+      }));
+      const checked = document.getElementById("news-checked");
+      checked.replaceChildren();
+      const checkedSummary = document.createElement("summary");
+      checkedSummary.textContent = "News sources checked";
+      checked.appendChild(checkedSummary);
+      data.news_checked.forEach((article) => {
+        const link = document.createElement("a");
+        link.href = article.url;
+        link.target = "_blank";
+        link.rel = "noopener noreferrer";
+        link.textContent = article.headline;
+        checked.appendChild(link);
+      });
+      document.getElementById("ideas-disclaimer").textContent = data.disclaimer;
+      document.getElementById("ideas-result").hidden = false;
+      status.textContent = `Updated ${new Date(data.data_as_of).toLocaleString()} · Generated by ${data.generated_by}`;
+    } catch (error) {
+      status.textContent = error.message;
+    } finally {
+      button.disabled = false;
+    }
+  });
+</script>
+{% endblock %}

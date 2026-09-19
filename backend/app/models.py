@@ -1,5 +1,6 @@
 from datetime import date
 from enum import Enum
+from typing import Literal
 
 from pydantic import BaseModel, Field, field_validator
 
@@ -205,4 +206,29 @@ class MarketResearch(BaseModel):
     portfolio_examples: list[PortfolioExample]
     news: list[MarketNewsItem]
     generated_by: str
+    disclaimer: str
+
+
+class SuggestionRequest(BaseModel):
+    time_horizon: Literal["under_3_years", "3_to_7_years", "over_7_years"]
+    risk_comfort: RiskComfort
+
+
+class TradeIdea(BaseModel):
+    symbol: str
+    name: str
+    instrument_type: str
+    period_return_percent: float | None
+    why_it_appeared: str
+    main_risk: str
+    next_step: str
+    related_news: list[MarketNewsItem]
+
+
+class SuggestedTrades(BaseModel):
+    beginner_summary: str
+    ideas: list[TradeIdea]
+    news_checked: list[MarketNewsItem]
+    generated_by: str
+    data_as_of: str
     disclaimer: str

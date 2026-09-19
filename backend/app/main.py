@@ -1,15 +1,26 @@
 from pathlib import Path
 
 from dotenv import load_dotenv
-from fastapi import FastAPI
+from fastapi import FastAPI, HTTPException, Request
 from fastapi.middleware.cors import CORSMiddleware
+from fastapi.staticfiles import StaticFiles
+from fastapi.templating import Jinja2Templates
 
 from .finance import analyze_profile
-from .models import FinancialAnalysis, FinancialProfile, PlanResponse
+from .market import MarketDataError, get_stock_history, get_stock_quote
+from .models import (
+    FinancialAnalysis,
+    FinancialProfile,
+    PlanResponse,
+    StockHistory,
+    StockQuote,
+)
 from .nemotron import create_coach
 
 
 load_dotenv(Path(__file__).resolve().parents[2] / ".env")
+PROJECT_ROOT = Path(__file__).resolve().parents[2]
+templates = Jinja2Templates(directory=PROJECT_ROOT / "templates")
 
 app = FastAPI(
     title="LifePath AI API",
@@ -23,6 +34,37 @@ app.add_middleware(
     allow_methods=["*"],
     allow_headers=["*"],
 )
+app.mount("/static", StaticFiles(directory=PROJECT_ROOT / "static"), name="static")
+
+
+@app.get("/", include_in_schema=False)
+def dashboard_page(request: Request):
+    return templates.TemplateResponse(request=request, name="index.html")
+
+
+@app.get("/money", include_in_schema=False)
+def money_page(request: Request):
+    return templates.TemplateResponse(request=request, name="money.html")
+
+
+@app.get("/calendar", include_in_schema=False)
+def calendar_page(request: Request):
+    return templates.TemplateResponse(request=request, name="calendar.html")
+
+
+@app.get("/goals", include_in_schema=False)
+def goals_page(request: Request):
+    return templates.TemplateResponse(request=request, name="goals.html")
+
+
+@app.get("/stocks", include_in_schema=False)
+def stocks_page(request: Request):
+    return templates.TemplateResponse(request=request, name="stocks.html")
+
+
+@app.get("/nemotron", include_in_schema=False)
+def nemotron_page(request: Request):
+    return templates.TemplateResponse(request=request, name="nemotron.html")
 
 
 @app.get("/health")
@@ -46,3 +88,23 @@ def plan(profile: FinancialProfile) -> PlanResponse:
             "tax, legal, or investment advice."
         ),
     )
+
+
+@app.get("/api/v1/stocks/{symbol}", response_model=StockQuote)
+def stock_quote(symbol: str) -> StockQuote:
+    try:
+        return StockQuote.model_validate(get_stock_quote(symbol))
+    except ValueError as exc:
+        raise HTTPException(status_code=400, detail=str(exc)) from exc
+    except MarketDataError as exc:
+        raise HTTPException(status_code=502, detail=str(exc)) from exc
+
+
+@app.get("/api/v1/stocks/{symbol}/history", response_model=StockHistory)
+def stock_history(symbol: str, days: int = 30) -> StockHistory:
+    try:
+        return StockHistory.model_validate(get_stock_history(symbol, days))
+    except ValueError as exc:
+        raise HTTPException(status_code=400, detail=str(exc)) from exc
+    except MarketDataError as exc:
+        raise HTTPException(status_code=502, detail=str(exc)) from exc

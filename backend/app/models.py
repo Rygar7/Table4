@@ -122,3 +122,31 @@ class PlanResponse(BaseModel):
     analysis: FinancialAnalysis
     coach: CoachResponse
     disclaimer: str
+
+
+class StockQuote(BaseModel):
+    symbol: str
+    price: float
+    previous_close: float | None
+    change: float | None
+    change_percent: float | None
+    currency: str
+    market_feed: str
+    as_of: str | None
+    disclaimer: str
+
+
+class StockBar(BaseModel):
+    timestamp: str
+    open: float
+    high: float
+    low: float
+    close: float
+    volume: float
+
+
+class StockHistory(BaseModel):
+    symbol: str
+    bars: list[StockBar]
+    market_feed: str
+    disclaimer: str

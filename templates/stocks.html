@@ -1,0 +1,99 @@
+{% extends "base.html" %}
+
+{% block content %}
+<section class="welcome">
+  <div>
+    <p class="label">MARKET WATCH</p>
+    <h1>Research before you invest.</h1>
+    <p>Track symbols and research notes once you connect a market-data source.</p>
+  </div>
+
+  <form id="stock-search" style="display: flex; gap: 8px; align-items: center;">
+    <input
+      id="stock-symbol"
+      aria-label="Stock symbol"
+      maxlength="10"
+      placeholder="AAPL"
+      required
+      style="padding: 12px; text-transform: uppercase;"
+    >
+    <button class="primary-button" type="submit">Check Stock</button>
+  </form>
+</section>
+
+<section class="panel">
+  <p class="label">LIVE MARKET LOOKUP</p>
+  <h2 id="quote-heading">Enter a stock symbol</h2>
+  <p id="quote-status">Try AAPL, NVDA, TSLA, or MSFT.</p>
+
+  <div id="quote-result" class="money-cards" hidden>
+    <article class="card">
+      <p>Latest price</p>
+      <h2 id="quote-price">—</h2>
+      <span id="quote-time">—</span>
+    </article>
+    <article class="card">
+      <p>Daily change</p>
+      <h2 id="quote-change">—</h2>
+      <span id="quote-feed">—</span>
+    </article>
+  </div>
+</section>
+
+<section class="content-grid" style="margin-top: 16px;">
+  <article class="panel">
+    <p class="label">RESEARCH CHECKLIST</p>
+    <h2>Before investing</h2>
+    <ul>
+      <li>Build an emergency fund first.</li>
+      <li>Do not invest money needed for bills.</li>
+      <li>Understand risk and diversification.</li>
+      <li>Research investments from trustworthy sources.</li>
+    </ul>
+  </article>
+
+  <article class="panel ai-panel">
+    <p class="label">IMPORTANT</p>
+    <h2>Research, not predictions.</h2>
+    <p>Future AI summaries should explain provided information without promising returns or giving personalized buy-and-sell instructions.</p>
+  </article>
+</section>
+
+<script>
+  const form = document.getElementById("stock-search");
+  const symbolInput = document.getElementById("stock-symbol");
+  const statusText = document.getElementById("quote-status");
+  const result = document.getElementById("quote-result");
+
+  form.addEventListener("submit", async (event) => {
+    event.preventDefault();
+    const symbol = symbolInput.value.trim().toUpperCase();
+    if (!symbol) return;
+
+    statusText.textContent = "Loading market data…";
+    result.hidden = true;
+
+    try {
+      const response = await fetch(`/api/v1/stocks/${encodeURIComponent(symbol)}`);
+      const data = await response.json();
+      if (!response.ok) throw new Error(data.detail || "Stock data is unavailable.");
+
+      document.getElementById("quote-heading").textContent = data.symbol;
+      document.getElementById("quote-price").textContent =
+        new Intl.NumberFormat("en-US", { style: "currency", currency: data.currency }).format(data.price);
+      document.getElementById("quote-change").textContent = data.change == null
+        ? "Unavailable"
+        : `${data.change >= 0 ? "+" : ""}${data.change.toFixed(2)} (${data.change_percent.toFixed(2)}%)`;
+      document.getElementById("quote-time").textContent = data.as_of
+        ? `As of ${new Date(data.as_of).toLocaleString()}`
+        : "Latest available price";
+      document.getElementById("quote-feed").textContent = `${data.market_feed} market feed`;
+      statusText.textContent = data.disclaimer;
+      result.hidden = false;
+    } catch (error) {
+      document.getElementById("quote-heading").textContent = symbol;
+      statusText.textContent = error.message;
+    }
+  });
+</script>
+{% endblock %}

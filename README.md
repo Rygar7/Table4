@@ -21,5 +21,9 @@ Open `http://127.0.0.1:8000/docs` for the interactive API documentation.
 - `GET /health` checks whether the API is running.
 - `POST /api/v1/simulate` returns cash-flow, emergency-fund, debt, and goal scenarios.
 - `POST /api/v1/plan` returns the calculations plus Nemotron guidance.
+- `GET /api/v1/stocks/{symbol}` returns the latest Alpaca/IEX stock quote.
+- `GET /api/v1/stocks/{symbol}/history` returns recent daily price history.
 
-Copy `.env.example` to `.env` and add a private NVIDIA key. Never commit `.env`.
+Open `http://127.0.0.1:8000/stocks` to use the connected stock lookup page.
+
+Copy `.env.example` to `.env` and add private NVIDIA and Alpaca credentials. Never commit `.env`.

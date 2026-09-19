@@ -52,7 +52,11 @@
           <linearGradient id="chart-fill-down" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="#ff6f91" stop-opacity=".40"/><stop offset="1" stop-color="#ff6f91" stop-opacity="0"/></linearGradient>
         </defs>
         <g id="chart-grid"></g><path id="chart-area"></path><path id="chart-line"></path><g id="chart-points"></g>
-        <g id="chart-cursor" hidden><line y1="20" y2="256"></line><circle r="6"></circle></g>
+        <g id="chart-cursor" hidden>
+          <line y1="20" y2="256"></line>
+          <circle class="cursor-halo" r="12"></circle>
+          <circle class="cursor-dot" r="6"></circle>
+        </g>
       </svg>
       <div id="chart-tooltip" class="chart-tooltip" hidden>
         <strong id="tooltip-price">—</strong><span id="tooltip-date">—</span>
@@ -189,10 +193,15 @@
     const pointX = chartState.x(index); const pointY = chartState.y(chartState.closes[index]);
     const pointScreenY = pointY / chartState.height * rect.height;
     const cursor = document.getElementById("chart-cursor");
-    const cursorLine = cursor.querySelector("line"); const cursorPoint = cursor.querySelector("circle");
+    const cursorLine = cursor.querySelector("line");
+    const cursorPoints = cursor.querySelectorAll("circle");
     cursorLine.setAttribute("x1", pointX); cursorLine.setAttribute("x2", pointX);
-    cursorPoint.setAttribute("cx", pointX); cursorPoint.setAttribute("cy", pointY);
-    cursorPoint.setAttribute("class", chartState.isUp ? "up" : "down"); cursor.hidden = false;
+    cursorPoints.forEach((point) => {
+      point.setAttribute("cx", pointX); point.setAttribute("cy", pointY);
+      point.classList.toggle("up", chartState.isUp);
+      point.classList.toggle("down", !chartState.isUp);
+    });
+    cursor.hidden = false;
     const tooltip = document.getElementById("chart-tooltip");
     const bar = chartState.bars[index];
     document.getElementById("tooltip-price").textContent = currency(bar.close);
@@ -201,9 +210,15 @@
     document.getElementById("tooltip-high").textContent = currency(bar.high);
     document.getElementById("tooltip-low").textContent = currency(bar.low);
     document.getElementById("tooltip-volume").textContent = new Intl.NumberFormat("en-US", { notation: "compact", maximumFractionDigits: 1 }).format(bar.volume);
-    tooltip.style.left = `${Math.max(82, Math.min(rect.width - 82, pointerX))}px`;
-    tooltip.style.top = `${Math.max(4, pointScreenY - 112)}px`;
     tooltip.hidden = false;
+    const pointScreenX = pointX / chartState.width * rect.width;
+    const tooltipGap = 14;
+    const tooltipWidth = tooltip.offsetWidth;
+    const tooltipLeft = pointScreenX + tooltipGap + tooltipWidth <= rect.width
+      ? pointScreenX + tooltipGap
+      : Math.max(0, pointScreenX - tooltipGap - tooltipWidth);
+    tooltip.style.left = `${tooltipLeft}px`;
+    tooltip.style.top = `${Math.max(4, pointScreenY - 112)}px`;
   }
 
   const chart = document.getElementById("stock-chart");

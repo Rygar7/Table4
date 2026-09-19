@@ -1260,7 +1260,8 @@ main::before {
 #stock-chart { cursor: crosshair; touch-action: none; user-select: none; }
 #chart-cursor line { stroke: rgba(240, 255, 244, .55); stroke-width: 1; stroke-dasharray: 4 5; }
 #chart-cursor[hidden] { display: none; }
-#chart-cursor circle { stroke: #06100d; stroke-width: 3; filter: drop-shadow(0 0 7px currentColor); }
+#chart-cursor .cursor-halo { fill: currentColor; opacity: .22; stroke: currentColor; stroke-width: 2; }
+#chart-cursor .cursor-dot { stroke: #06100d; stroke-width: 3; filter: drop-shadow(0 0 8px currentColor); }
 #chart-cursor circle.up { fill: var(--cyan); color: var(--cyan); }
 #chart-cursor circle.down { fill: var(--coral); color: var(--coral); }
 .chart-tooltip {
@@ -1274,7 +1275,6 @@ main::before {
   border: 1px solid rgba(65, 230, 211, .35);
   border-radius: 9px;
   box-shadow: 0 10px 26px rgba(0, 0, 0, .42);
-  transform: translateX(-50%);
 }
 .chart-tooltip[hidden] { display: none; }
 .chart-tooltip strong, .chart-tooltip span { display: block; }

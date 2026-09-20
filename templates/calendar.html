@@ -115,7 +115,7 @@
     const subscriptions = loadJson(SUBSCRIPTION_KEY, []); const goal = loadJson(GOAL_KEY, null);
     const gross = Number(moneyData.income?.gross_income || 0);
     const taxRate = Number(moneyData.income?.income_tax_rate || 0) + Number(moneyData.income?.payroll_tax_rate || 0);
-    const monthlyIncome = Math.max(0, gross * (1 - Math.min(taxRate, 95) / 100));
+    const monthlyIncome = Math.max(0, Number(moneyData.income?.tax_estimate?.take_home_monthly) || gross * (1 - Math.min(taxRate, 95) / 100));
     const expenseTotal = (moneyData.expenses || []).reduce((sum, item) => sum + Number(item.amount || 0), 0);
     const subscriptionTotal = subscriptions.reduce((sum, item) => sum + monthlySubscriptionCost(item), 0);
     return { moneyData, subscriptions, goal, monthlyIncome, expenseTotal, subscriptionTotal, surplus: monthlyIncome - expenseTotal - subscriptionTotal };

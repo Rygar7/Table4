@@ -22,23 +22,23 @@
       <input name="gross_income" type="number" min="1" step="0.01" placeholder="5,000" aria-describedby="gross-income-help" required>
     </label>
 
-    <label class="friendly-field">
-      <span>Estimated income tax</span>
-      <small>Use a rough percentage if you do not know the exact number.</small>
-      <div class="input-suffix"><input name="income_tax_rate" type="number" min="0" max="100" step="0.01" placeholder="12" value="0"><b>%</b></div>
+    <label class="friendly-field featured-field">
+      <span>Home ZIP code</span>
+      <small>Used only to identify your state and estimate state income tax.</small>
+      <input name="zip_code" inputmode="numeric" pattern="[0-9]{5}" maxlength="5" placeholder="15213" required>
     </label>
 
-    <label class="friendly-field">
-      <span>Estimated payroll tax</span>
-      <small>For example, Social Security and Medicare in the U.S.</small>
-      <div class="input-suffix"><input name="payroll_tax_rate" type="number" min="0" max="100" step="0.01" placeholder="7.65" value="0"><b>%</b></div>
-    </label>
+    <div class="tax-controls">
+      <div><p class="label">2026 TAX ESTIMATE</p><h3>Federal, state, and payroll taxes</h3><p id="tax-location">Enter your income and ZIP code, then calculate.</p></div>
+      <button id="calculate-taxes" class="light-button" type="button">Calculate Taxes</button>
+      <label class="manual-tax-toggle"><input id="manual-tax-toggle" type="checkbox"> Enter tax rates manually</label>
+    </div>
 
-    <label class="friendly-field">
-      <span>Sales tax / VAT estimate</span>
-      <small>Used as planning context; it is not deducted from your paycheck.</small>
-      <div class="input-suffix"><input name="sales_tax_rate" type="number" min="0" max="100" step="0.01" placeholder="6" value="0"><b>%</b></div>
-    </label>
+    <div id="manual-tax-fields" class="manual-tax-fields" hidden>
+      <label><span>Federal rate</span><div class="input-suffix"><input name="manual_federal_rate" type="number" min="0" max="100" step="0.01" value="0"><b>%</b></div></label>
+      <label><span>State rate</span><div class="input-suffix"><input name="manual_state_rate" type="number" min="0" max="100" step="0.01" value="0"><b>%</b></div></label>
+      <label><span>Payroll rate</span><div class="input-suffix"><input name="manual_payroll_rate" type="number" min="0" max="100" step="0.01" value="7.65"><b>%</b></div></label>
+    </div>
 
     <label class="friendly-field">
       <span>How often are you paid?</span>
@@ -58,10 +58,13 @@
     </label>
 
     <div id="income-preview" class="income-preview" aria-live="polite">
-      <p class="label">INSTANT CHECK</p>
+      <p class="label">MONTHLY PAY ESTIMATE</p>
       <div><span>Yearly equivalent</span><strong id="annual-income-preview">—</strong></div>
-      <div><span>Estimated monthly take-home</span><strong id="take-home-preview">—</strong></div>
-      <p id="income-warning">Enter your monthly income to see a quick check.</p>
+      <div><span>Federal income tax</span><strong id="federal-tax-preview">—</strong></div>
+      <div><span>State income tax</span><strong id="state-tax-preview">—</strong></div>
+      <div><span>Social Security &amp; Medicare</span><strong id="payroll-tax-preview">—</strong></div>
+      <div class="take-home-result"><span>Estimated take-home</span><strong id="take-home-preview">—</strong></div>
+      <p id="income-warning">Enter your monthly income and ZIP code to calculate.</p>
     </div>
 
     <div class="friendly-form-actions">
@@ -119,6 +122,9 @@
   const incomeForm = document.getElementById("income-form");
   const expenseForm = document.getElementById("expense-form");
   const expenseList = document.getElementById("expense-list");
+  const manualTaxToggle = document.getElementById("manual-tax-toggle");
+  const manualTaxFields = document.getElementById("manual-tax-fields");
+  let taxEstimate = money.income?.tax_estimate || null;
 
   function formatMoney(value) {
     return new Intl.NumberFormat("en-US", { style: "currency", currency: "USD", maximumFractionDigits: 0 }).format(value);
@@ -126,16 +132,40 @@
 
   function updateIncomePreview() {
     const gross = Number(incomeForm.elements.gross_income.value || 0);
-    const incomeTax = Number(incomeForm.elements.income_tax_rate.value || 0);
-    const payrollTax = Number(incomeForm.elements.payroll_tax_rate.value || 0);
-    const totalTax = Math.min(95, Math.max(0, incomeTax + payrollTax));
     document.getElementById("annual-income-preview").textContent = gross ? formatMoney(gross * 12) : "—";
-    document.getElementById("take-home-preview").textContent = gross ? formatMoney(gross * (1 - totalTax / 100)) : "—";
+    const matches = taxEstimate && Number(taxEstimate.annual_gross) === gross * 12 && taxEstimate.zip_code === incomeForm.elements.zip_code.value;
+    document.getElementById("federal-tax-preview").textContent = matches ? `−${formatMoney(taxEstimate.federal_monthly)}` : "—";
+    document.getElementById("state-tax-preview").textContent = matches ? `−${formatMoney(taxEstimate.state_monthly)}` : "—";
+    document.getElementById("payroll-tax-preview").textContent = matches ? `−${formatMoney(taxEstimate.payroll_monthly)}` : "—";
+    document.getElementById("take-home-preview").textContent = matches ? formatMoney(taxEstimate.take_home_monthly) : "—";
+    document.getElementById("tax-location").textContent = matches ? `${taxEstimate.state} · ${taxEstimate.used_manual_rates ? "manual rates" : "2026 bracket estimate"} · ${taxEstimate.effective_tax_rate}% estimated total tax` : "Enter your income and ZIP code, then calculate.";
     const warning = document.getElementById("income-warning");
-    if (!gross) warning.textContent = "Enter your monthly income to see a quick check.";
+    if (!gross) warning.textContent = "Enter your monthly income and ZIP code to calculate.";
     else if (gross > 50000) warning.textContent = `That equals ${formatMoney(gross * 12)} per year. Double-check that you did not enter an annual salary.`;
-    else warning.textContent = "Looks reasonable for a monthly entry. This is still only an estimate.";
+    else if (!matches) warning.textContent = "Select Calculate Taxes to update your take-home estimate.";
+    else warning.textContent = taxEstimate.disclaimer;
     warning.className = gross > 50000 ? "input-warning" : "";
+  }
+
+  async function calculateTaxes() {
+    const gross = Number(incomeForm.elements.gross_income.value || 0);
+    const zipCode = incomeForm.elements.zip_code.value.trim();
+    const status = document.getElementById("income-status");
+    if (!gross || !/^\d{5}$/.test(zipCode)) { status.textContent = "Enter a monthly income and a five-digit ZIP code first."; return false; }
+    const payload = { monthly_gross: gross, zip_code: zipCode };
+    if (manualTaxToggle.checked) {
+      payload.manual_federal_rate = Number(incomeForm.elements.manual_federal_rate.value || 0);
+      payload.manual_state_rate = Number(incomeForm.elements.manual_state_rate.value || 0);
+      payload.manual_payroll_rate = Number(incomeForm.elements.manual_payroll_rate.value || 0);
+    }
+    status.textContent = "Calculating 2026 federal, state, and payroll taxes…";
+    try {
+      const response = await fetch("/api/v1/tax-estimate", { method: "POST", headers: { "Content-Type": "application/json" }, body: JSON.stringify(payload) });
+      const data = await response.json();
+      if (!response.ok) throw new Error(data.detail || "Unable to calculate taxes.");
+      taxEstimate = { ...data, zip_code: zipCode };
+      updateIncomePreview(); status.textContent = "Tax estimate updated."; return true;
+    } catch (error) { status.textContent = error.message; return false; }
   }
 
   function renderExpenses() {
@@ -172,11 +202,17 @@
   Object.entries(money.income || {}).forEach(([name, value]) => {
     if (incomeForm.elements[name]) incomeForm.elements[name].value = value;
   });
+  manualTaxToggle.checked = Boolean(money.income?.manual_tax_rates);
+  manualTaxFields.hidden = !manualTaxToggle.checked;
+  manualTaxToggle.addEventListener("change", () => { manualTaxFields.hidden = !manualTaxToggle.checked; taxEstimate = null; updateIncomePreview(); });
+  document.getElementById("calculate-taxes").addEventListener("click", calculateTaxes);
   incomeForm.addEventListener("input", updateIncomePreview);
 
-  incomeForm.addEventListener("submit", (event) => {
+  incomeForm.addEventListener("submit", async (event) => {
     event.preventDefault();
-    money.income = Object.fromEntries(new FormData(incomeForm).entries());
+    const calculated = await calculateTaxes();
+    if (!calculated) return;
+    money.income = { ...Object.fromEntries(new FormData(incomeForm).entries()), tax_estimate: taxEstimate, manual_tax_rates: manualTaxToggle.checked };
     localStorage.setItem(MONEY_KEY, JSON.stringify(money));
     document.getElementById("income-status").textContent = "Saved. Your dashboard and calendar are updated.";
     document.getElementById("income-status").className = "save-success";

@@ -168,7 +168,7 @@
 
     const gross = Number(money.income.gross_income);
     const taxRate = Number(money.income.income_tax_rate || 0) + Number(money.income.payroll_tax_rate || 0);
-    const monthlyIncome = Math.max(1, gross * (1 - Math.min(taxRate, 95) / 100));
+    const monthlyIncome = Math.max(1, Number(money.income?.tax_estimate?.take_home_monthly) || gross * (1 - Math.min(taxRate, 95) / 100));
     const expenses = (money.expenses || []).map((expense) => ({
       name: expense.name,
       amount: Number(expense.amount),

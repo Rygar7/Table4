@@ -6,7 +6,7 @@
   <title>LifePath AI</title>
   <link rel="icon" type="image/png" href="{{ url_for('static', path='lifepath-logo.png') }}">
   <link rel="stylesheet" href="{{ url_for('static', path='style.css') }}">
-  <link rel="stylesheet" href="{{ url_for('static', path='professional.css') }}">
+  <link rel="stylesheet" href="{{ url_for('static', path='professional.css') }}?v=4">
   <script>
     (() => {
       const savedTheme = localStorage.getItem("lifepath-color-theme");
@@ -20,7 +20,6 @@
   '/money': 'money',
   '/calendar': 'calendar',
   '/goals': 'goals',
-  '/accounts': 'accounts',
   '/subscriptions': 'subscriptions',
   '/stocks': 'stocks',
   '/ideas': 'ideas',
@@ -39,12 +38,11 @@
     <nav class="primary-nav" aria-label="Main navigation">
       <a href="/" class="nav-overview {{ 'active' if current_path == '/' else '' }}">Overview</a>
 
-      <details class="nav-group nav-money {{ 'active-group' if current_path in ['/money', '/subscriptions', '/accounts'] else '' }}">
+      <details class="nav-group nav-money {{ 'active-group' if current_path in ['/money', '/subscriptions'] else '' }}">
         <summary>Money <span aria-hidden="true">⌄</span></summary>
         <div class="nav-popover">
           <a href="/money" class="{{ 'active' if current_path == '/money' else '' }}"><strong>Budget</strong><small>Income and monthly expenses</small></a>
           <a href="/subscriptions" class="{{ 'active' if current_path == '/subscriptions' else '' }}"><strong>Subscriptions</strong><small>Recurring charges and renewals</small></a>
-          <a href="/accounts" class="{{ 'active' if current_path == '/accounts' else '' }}"><strong>Accounts &amp; Credit</strong><small>Balances, cards, and loans</small></a>
         </div>
       </details>
 

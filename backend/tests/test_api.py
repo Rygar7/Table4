@@ -21,6 +21,12 @@ def test_money_page_clarifies_monthly_income() -> None:
     assert response.status_code == 200
     assert "Income before taxes each month" in response.text
     assert "Yearly equivalent" in response.text
+    assert "Home ZIP code" in response.text
+    assert "Federal income tax" in response.text
+
+
+def test_accounts_feature_is_removed() -> None:
+    assert client.get("/accounts").status_code == 404
 
 
 def test_ai_coach_has_saved_plan_history() -> None:
@@ -77,35 +83,41 @@ def test_simulate() -> None:
     assert len(body["scenarios"]) == 3
 
 
-def test_credit_advice_endpoint(monkeypatch) -> None:
+def test_tax_estimate_separates_federal_state_and_payroll(monkeypatch) -> None:
     from backend.app import main
 
-    monkeypatch.setattr(
-        main,
-        "create_credit_advice",
-        lambda profile, metrics: __import__(
-            "backend.app.credit_coach", fromlist=["_fallback"]
-        )._fallback(profile, metrics),
-    )
+    monkeypatch.setattr(main, "lookup_zip", lambda zip_code: ("Pennsylvania", "PA"))
     response = client.post(
-        "/api/v1/credit/advice",
+        "/api/v1/tax-estimate",
         json={
-            "bank_accounts": [],
-            "credit_cards": [
-                {
-                    "name": "Card",
-                    "balance": 500,
-                    "credit_limit": 1000,
-                    "apr": 20,
-                    "minimum_payment": 30,
-                    "missed_payments_12_months": 0,
-                }
-            ],
-            "loans": [],
-            "oldest_account_years": 2,
-            "recent_credit_applications": 0,
+            "monthly_gross": 5000,
+            "zip_code": "15213",
         },
     )
     assert response.status_code == 200
-    assert response.json()["metrics"]["overall_utilization_percent"] == 50.0
-    assert len(response.json()["priorities"]) == 3
+    body = response.json()
+    assert body["state_code"] == "PA"
+    assert body["federal_monthly"] > 0
+    assert body["state_monthly"] > 0
+    assert body["payroll_monthly"] > 0
+    assert body["take_home_monthly"] < 5000
+
+
+def test_manual_tax_rates_override_brackets(monkeypatch) -> None:
+    from backend.app import main
+
+    monkeypatch.setattr(main, "lookup_zip", lambda zip_code: ("Texas", "TX"))
+    response = client.post(
+        "/api/v1/tax-estimate",
+        json={
+            "monthly_gross": 5000,
+            "zip_code": "78701",
+            "manual_federal_rate": 10,
+            "manual_state_rate": 2,
+            "manual_payroll_rate": 5,
+        },
+    )
+    assert response.status_code == 200
+    assert response.json()["federal_monthly"] == 500
+    assert response.json()["state_monthly"] == 100
+    assert response.json()["payroll_monthly"] == 250

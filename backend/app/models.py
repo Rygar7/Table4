@@ -245,65 +245,27 @@ class SuggestedTrades(BaseModel):
     disclaimer: str
 
 
-class BankAccount(BaseModel):
-    name: str = Field(min_length=1, max_length=80)
-    account_type: Literal["checking", "savings"]
-    balance: float = Field(ge=0)
+class TaxEstimateRequest(BaseModel):
+    monthly_gross: float = Field(gt=0, le=10_000_000)
+    zip_code: str = Field(pattern=r"^\d{5}$")
+    manual_federal_rate: float | None = Field(default=None, ge=0, le=100)
+    manual_state_rate: float | None = Field(default=None, ge=0, le=100)
+    manual_payroll_rate: float | None = Field(default=None, ge=0, le=100)
 
 
-class CreditCardAccount(BaseModel):
-    name: str = Field(min_length=1, max_length=80)
-    balance: float = Field(ge=0)
-    credit_limit: float = Field(gt=0)
-    apr: float = Field(ge=0, le=100)
-    minimum_payment: float = Field(ge=0)
-    missed_payments_12_months: int = Field(ge=0, le=12)
-
-
-class LoanAccount(BaseModel):
-    name: str = Field(min_length=1, max_length=80)
-    balance: float = Field(ge=0)
-    apr: float = Field(ge=0, le=100)
-    monthly_payment: float = Field(ge=0)
-
-
-class CreditProfile(BaseModel):
-    credit_score: int | None = Field(default=None, ge=300, le=850)
-    bank_accounts: list[BankAccount] = Field(default_factory=list)
-    credit_cards: list[CreditCardAccount] = Field(default_factory=list)
-    loans: list[LoanAccount] = Field(default_factory=list)
-    oldest_account_years: float = Field(default=0, ge=0, le=100)
-    recent_credit_applications: int = Field(default=0, ge=0, le=50)
-
-
-class CardUtilization(BaseModel):
-    name: str
-    utilization_percent: float
-
-
-class CreditMetrics(BaseModel):
-    total_card_balance: float
-    total_credit_limit: float
-    overall_utilization_percent: float | None
-    high_utilization_cards: list[CardUtilization]
-    missed_payments_12_months: int
-    total_loan_balance: float
-    monthly_debt_payments: float
-    available_cash: float
-
-
-class CreditPriority(BaseModel):
-    rank: int = Field(ge=1, le=3)
-    title: str
-    why: str
-    action: str
-
-
-class CreditAdvice(BaseModel):
-    summary: str
-    priorities: list[CreditPriority]
-    questions: list[str]
-    metrics: CreditMetrics
-    generated_by: str
+class TaxEstimate(BaseModel):
+    tax_year: int
+    state: str
+    state_code: str
+    annual_gross: float
+    federal_annual: float
+    state_annual: float
+    payroll_annual: float
+    federal_monthly: float
+    state_monthly: float
+    payroll_monthly: float
+    take_home_monthly: float
+    effective_tax_rate: float
+    used_manual_rates: bool
     disclaimer: str
-    source_links: list[str]
+    sources: list[str]

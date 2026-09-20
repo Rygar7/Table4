@@ -7,8 +7,6 @@ from fastapi.staticfiles import StaticFiles
 from fastapi.templating import Jinja2Templates
 
 from .finance import analyze_profile
-from .credit import analyze_credit
-from .credit_coach import create_credit_advice
 from .market import (
     MarketDataError,
     calculate_stock_metrics,
@@ -22,8 +20,6 @@ from .market import (
 from .models import (
     FinancialAnalysis,
     FinancialProfile,
-    CreditAdvice,
-    CreditProfile,
     MarketNewsItem,
     MarketResearch,
     MarketTrend,
@@ -34,11 +30,14 @@ from .models import (
     StockQuote,
     SuggestedTrades,
     SuggestionRequest,
+    TaxEstimate,
+    TaxEstimateRequest,
 )
 from .market_research import create_market_research
 from .nemotron import create_coach
 from .stock_coach import create_stock_insight
 from .trade_ideas import INSTRUMENTS, candidate_symbols, create_suggested_trades
+from .tax import TaxLookupError, estimate_taxes, lookup_zip
 
 
 load_dotenv(Path(__file__).resolve().parents[2] / ".env")
@@ -90,11 +89,6 @@ def ideas_page(request: Request):
     return templates.TemplateResponse(request=request, name="ideas.html")
 
 
-@app.get("/accounts", include_in_schema=False)
-def accounts_page(request: Request):
-    return templates.TemplateResponse(request=request, name="accounts.html")
-
-
 @app.get("/subscriptions", include_in_schema=False)
 def subscriptions_page(request: Request):
     return templates.TemplateResponse(request=request, name="subscriptions.html")
@@ -128,10 +122,31 @@ def plan(profile: FinancialProfile) -> PlanResponse:
     )
 
 
-@app.post("/api/v1/credit/advice", response_model=CreditAdvice)
-def credit_advice(profile: CreditProfile) -> CreditAdvice:
-    metrics = analyze_credit(profile)
-    return create_credit_advice(profile, metrics)
+@app.post("/api/v1/tax-estimate", response_model=TaxEstimate)
+def tax_estimate(payload: TaxEstimateRequest) -> TaxEstimate:
+    try:
+        state, state_code = lookup_zip(payload.zip_code)
+    except TaxLookupError as exc:
+        raise HTTPException(status_code=422, detail=str(exc)) from exc
+    annual_gross = payload.monthly_gross * 12
+    values = estimate_taxes(payload.monthly_gross, state_code)
+    manual = any(rate is not None for rate in (payload.manual_federal_rate, payload.manual_state_rate, payload.manual_payroll_rate))
+    federal = annual_gross * payload.manual_federal_rate / 100 if payload.manual_federal_rate is not None else values["federal"]
+    state_tax = annual_gross * payload.manual_state_rate / 100 if payload.manual_state_rate is not None else values["state"]
+    payroll = annual_gross * payload.manual_payroll_rate / 100 if payload.manual_payroll_rate is not None else values["payroll"]
+    total = federal + state_tax + payroll
+    return TaxEstimate(
+        tax_year=2026,
+        state=state,
+        state_code=state_code,
+        annual_gross=round(annual_gross, 2),
+        federal_annual=round(federal, 2), state_annual=round(state_tax, 2), payroll_annual=round(payroll, 2),
+        federal_monthly=round(federal / 12, 2), state_monthly=round(state_tax / 12, 2), payroll_monthly=round(payroll / 12, 2),
+        take_home_monthly=round(max(0, payload.monthly_gross - total / 12), 2),
+        effective_tax_rate=round(total / annual_gross * 100, 2), used_manual_rates=manual,
+        disclaimer="Educational 2026 estimate using simplified single-filer assumptions. Credits, dependents, deductions, local taxes, and special state rules are not included.",
+        sources=["IRS 2026 inflation adjustments", "IRS Topic 751", "Tax Foundation 2026 state brackets", "Zippopotam.us ZIP lookup"],
+    )
 
 
 @app.get("/api/v1/market/research", response_model=MarketResearch)

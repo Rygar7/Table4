@@ -90,6 +90,17 @@ input:focus, select:focus { border-color: var(--green); outline: 2px solid #2566
 .setup-step > i { font-family: inherit; font-size: 11px; }
 .friendly-field { padding: 16px; }
 .friendly-field > small { font-weight: 400; }
+.tax-controls { grid-column: 1 / -1; display: grid; grid-template-columns: minmax(0, 1fr) auto; align-items: center; gap: 12px 20px; padding: 20px; background: var(--page-soft); border: 1px solid rgba(var(--page-rgb), .2); border-radius: 11px; }
+.tax-controls h3, .tax-controls p { margin: 0; }
+.tax-controls .label { margin-bottom: 5px; }
+.tax-controls #tax-location { color: var(--muted); font-size: 13px; }
+.manual-tax-toggle { grid-column: 1 / -1; display: inline-flex; align-items: center; gap: 8px; width: max-content; color: var(--muted); font-size: 13px; cursor: pointer; }
+.manual-tax-toggle input { width: 16px; height: 16px; min-height: 0; margin: 0; accent-color: var(--green); }
+.manual-tax-fields { grid-column: 1 / -1; display: grid; grid-template-columns: repeat(3, 1fr); gap: 12px; padding: 16px; background: #f7f9f8; border: 1px solid var(--line); border-radius: 9px; }
+.manual-tax-fields[hidden] { display: none; }
+.manual-tax-fields label > span { display: block; margin-bottom: 7px; color: var(--text); font-size: 12px; font-weight: 650; }
+.income-preview .take-home-result { background: #e8f1ed; border: 1px solid #c5d8d0; }
+.income-preview .take-home-result strong { color: var(--green); }
 .friendly-form-grid { gap: 16px; }
 .income-preview { grid-column: 1 / -1; }
 .income-preview span, .income-preview > p:last-child { font-size: 13px; }
@@ -360,6 +371,9 @@ html[data-color-theme="dark"] .ai-panel { background: linear-gradient(135deg, rg
 html[data-color-theme="dark"] #coach-priorities li { background: #202a2f; }
 html[data-color-theme="dark"] .coach-top-action { background: linear-gradient(120deg, #20362f, #1c2825); border-color: #3f6658; }
 html[data-color-theme="dark"] .setup-guide.is-complete .setup-count { background: #20362f; }
+html[data-color-theme="dark"] .tax-controls { background: var(--page-soft); }
+html[data-color-theme="dark"] .manual-tax-fields { background: #202a31; }
+html[data-color-theme="dark"] .income-preview .take-home-result { background: #20362f; border-color: #3f6658; }
 html[data-color-theme="dark"] .panel,
 html[data-color-theme="dark"] .card,
 html[data-color-theme="dark"] .idea-card,
@@ -375,4 +389,7 @@ html[data-color-theme="dark"] .chart-panel { box-shadow: 0 9px 25px rgba(0, 0, 0
   .visual-banner { align-items: flex-start; }
   .focus-link { margin-top: 4px; }
   .setup-guide.is-complete { grid-template-columns: 1fr; }
+  .tax-controls { grid-template-columns: 1fr; }
+  .manual-tax-toggle { grid-column: auto; }
+  .manual-tax-fields { grid-template-columns: 1fr; }
 }

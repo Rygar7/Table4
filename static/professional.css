@@ -99,6 +99,8 @@ input:focus, select:focus { border-color: var(--green); outline: 2px solid #2566
 .manual-tax-fields { grid-column: 1 / -1; display: grid; grid-template-columns: repeat(3, 1fr); gap: 12px; padding: 16px; background: #f7f9f8; border: 1px solid var(--line); border-radius: 9px; }
 .manual-tax-fields[hidden] { display: none; }
 .manual-tax-fields label > span { display: block; margin-bottom: 7px; color: var(--text); font-size: 12px; font-weight: 650; }
+.income-preview .total-tax-result { background: #f4eee4; border: 1px solid #dfd0b8; }
+.income-preview .total-tax-result strong { color: #805f33; }
 .income-preview .take-home-result { background: #e8f1ed; border: 1px solid #c5d8d0; }
 .income-preview .take-home-result strong { color: var(--green); }
 .friendly-form-grid { gap: 16px; }
@@ -373,6 +375,8 @@ html[data-color-theme="dark"] .coach-top-action { background: linear-gradient(12
 html[data-color-theme="dark"] .setup-guide.is-complete .setup-count { background: #20362f; }
 html[data-color-theme="dark"] .tax-controls { background: var(--page-soft); }
 html[data-color-theme="dark"] .manual-tax-fields { background: #202a31; }
+html[data-color-theme="dark"] .income-preview .total-tax-result { background: #2d2921; border-color: #5c4d36; }
+html[data-color-theme="dark"] .income-preview .total-tax-result strong { color: #d5b47c; }
 html[data-color-theme="dark"] .income-preview .take-home-result { background: #20362f; border-color: #3f6658; }
 html[data-color-theme="dark"] .panel,
 html[data-color-theme="dark"] .card,

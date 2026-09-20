@@ -23,6 +23,7 @@ def test_money_page_clarifies_monthly_income() -> None:
     assert "Yearly equivalent" in response.text
     assert "Home ZIP code" in response.text
     assert "Federal income tax" in response.text
+    assert "Total estimated tax" in response.text
 
 
 def test_accounts_feature_is_removed() -> None:
@@ -34,6 +35,7 @@ def test_ai_coach_has_saved_plan_history() -> None:
     assert response.status_code == 200
     assert "SAVED PLAN HISTORY" in response.text
     assert "lifepath_plan_history_v1" in response.text
+    assert "Ready to review your finances?" not in response.text
 
 
 def test_health() -> None:

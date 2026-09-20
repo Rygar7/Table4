@@ -23,8 +23,8 @@
     <p>Do not enter passwords, account numbers, or government ID information.</p>
   </article>
 
-  <article class="panel ai-panel">
-    <p class="label">COACH RESPONSE</p>
+  <article id="coach-panel" class="panel ai-panel">
+    <div class="coach-response-heading"><p class="label">COACH RESPONSE</p><span id="coach-plan-meta" class="coach-plan-meta">No saved plan</span></div>
     <h2 id="coach-heading">Your AI plan will appear here.</h2>
     <p id="coach-summary">Save your money information and goal, then generate a plan.</p>
     <ol id="coach-priorities"></ol>
@@ -46,7 +46,100 @@
   <p id="plan-status"></p>
 </section>
 
+<section class="panel plan-history-panel">
+  <div class="plan-history-heading">
+    <div><p class="label">SAVED PLAN HISTORY</p><h2>Return to an earlier plan</h2><p>Plans are saved on this device, so switching pages will not erase them.</p></div>
+    <span id="plan-history-count" class="simple-badge">0 saved</span>
+  </div>
+  <div id="plan-history-list" class="plan-history-list">
+    <div class="empty-plan-history">Generate your first plan to begin a history.</div>
+  </div>
+</section>
+
 <script>
+  const PLAN_HISTORY_KEY = "lifepath_plan_history_v1";
+  let planHistory = loadPlanHistory();
+  let activePlanId = null;
+
+  function loadPlanHistory() {
+    try {
+      const saved = JSON.parse(localStorage.getItem(PLAN_HISTORY_KEY) || "[]");
+      return Array.isArray(saved) ? saved.filter((record) => record?.data?.analysis?.cash_flow && record?.data?.coach) : [];
+    } catch { return []; }
+  }
+
+  function formatMoney(value) {
+    return new Intl.NumberFormat("en-US", { style: "currency", currency: "USD", maximumFractionDigits: 0 }).format(value);
+  }
+
+  function readablePlanDate(value) {
+    return new Date(value).toLocaleString("en-US", { month: "short", day: "numeric", year: "numeric", hour: "numeric", minute: "2-digit" });
+  }
+
+  function displayPlan(record, restored = false) {
+    const data = record.data;
+    activePlanId = record.id;
+    document.getElementById("coach-heading").textContent = data.analysis.goal_name;
+    document.getElementById("coach-summary").textContent = data.coach.summary;
+    const priorities = document.getElementById("coach-priorities");
+    priorities.replaceChildren(...data.coach.priorities.map((item) => {
+      const entry = document.createElement("li");
+      const title = document.createElement("strong"); title.textContent = item.title;
+      const reason = document.createElement("span"); reason.textContent = item.reason;
+      entry.append(title, reason); return entry;
+    }));
+    document.getElementById("coach-risk").textContent = data.coach.risk_note;
+    document.getElementById("coach-plan-meta").textContent = `${readablePlanDate(record.createdAt)} · ${data.coach.generated_by}`;
+    document.getElementById("regular-expense-total").textContent = formatMoney(record.regularExpenseTotal || 0);
+    document.getElementById("subscription-expense-total").textContent = formatMoney(record.subscriptionTotal || 0);
+    document.getElementById("total-expense-input").textContent = formatMoney(data.analysis.cash_flow.monthly_expenses);
+    document.getElementById("monthly-leftover").textContent = formatMoney(data.analysis.cash_flow.monthly_surplus);
+    document.getElementById("monthly-leftover").className = data.analysis.cash_flow.monthly_surplus >= 0 ? "positive-text" : "negative-text";
+    document.getElementById("plan-input-summary").hidden = false;
+    if (restored) document.getElementById("plan-status").textContent = `Viewing the plan saved ${readablePlanDate(record.createdAt)}. Generate again whenever your finances change.`;
+    renderPlanHistory();
+  }
+
+  function savePlan(data, context) {
+    const record = {
+      id: crypto.randomUUID ? crypto.randomUUID() : `${Date.now()}-${Math.random()}`,
+      createdAt: new Date().toISOString(),
+      regularExpenseTotal: context.regularExpenseTotal,
+      subscriptionTotal: context.subscriptionTotal,
+      expenseCount: context.expenseCount,
+      subscriptionCount: context.subscriptionCount,
+      data,
+    };
+    planHistory.unshift(record);
+    planHistory = planHistory.slice(0, 12);
+    localStorage.setItem(PLAN_HISTORY_KEY, JSON.stringify(planHistory));
+    localStorage.setItem("lifepath_plan_generated", record.createdAt);
+    return record;
+  }
+
+  function renderPlanHistory() {
+    const list = document.getElementById("plan-history-list");
+    document.getElementById("plan-history-count").textContent = `${planHistory.length} saved`;
+    if (!planHistory.length) {
+      const empty = document.createElement("div"); empty.className = "empty-plan-history"; empty.textContent = "Generate your first plan to begin a history."; list.replaceChildren(empty); return;
+    }
+    list.replaceChildren(...planHistory.map((record, index) => {
+      const card = document.createElement("article"); card.className = `plan-history-card${record.id === activePlanId ? " active" : ""}`;
+      const top = document.createElement("div"); top.className = "plan-history-card-top";
+      const date = document.createElement("time"); date.dateTime = record.createdAt; date.textContent = readablePlanDate(record.createdAt);
+      const badge = document.createElement("span"); badge.textContent = index === 0 ? "LATEST" : record.data.coach.generated_by.toUpperCase(); top.append(date, badge);
+      const title = document.createElement("h3"); title.textContent = record.data.analysis.goal_name;
+      const summary = document.createElement("p"); summary.textContent = record.data.coach.summary;
+      const metrics = document.createElement("div"); metrics.className = "plan-history-metrics";
+      const spending = document.createElement("span"); spending.textContent = `${formatMoney(record.data.analysis.cash_flow.monthly_expenses)} spending`;
+      const surplus = document.createElement("span"); surplus.textContent = `${formatMoney(record.data.analysis.cash_flow.monthly_surplus)} left`;
+      metrics.append(spending, surplus);
+      const button = document.createElement("button"); button.type = "button"; button.textContent = record.id === activePlanId ? "Currently viewing" : "View this plan"; button.disabled = record.id === activePlanId;
+      button.addEventListener("click", () => { displayPlan(record, true); document.getElementById("coach-panel").scrollIntoView({ behavior: "smooth", block: "center" }); });
+      card.append(top, title, summary, metrics, button); return card;
+    }));
+  }
+
   document.getElementById("generate-plan").addEventListener("click", async () => {
     const money = JSON.parse(localStorage.getItem("lifepath_money") || "null");
     const goal = JSON.parse(localStorage.getItem("lifepath_goal") || "null");
@@ -112,27 +205,15 @@
       });
       const data = await response.json();
       if (!response.ok) throw new Error(data.detail?.[0]?.msg || "Unable to generate the plan.");
-      document.getElementById("coach-heading").textContent = data.analysis.goal_name;
-      document.getElementById("coach-summary").textContent = data.coach.summary;
-      const priorities = document.getElementById("coach-priorities");
-      priorities.replaceChildren(...data.coach.priorities.map((item) => {
-        const entry = document.createElement("li");
-        entry.textContent = `${item.title} — ${item.reason}`;
-        return entry;
-      }));
-      document.getElementById("coach-risk").textContent = data.coach.risk_note;
-      const formatMoney = (value) => new Intl.NumberFormat("en-US", { style: "currency", currency: "USD", maximumFractionDigits: 0 }).format(value);
-      document.getElementById("regular-expense-total").textContent = formatMoney(regularExpenseTotal);
-      document.getElementById("subscription-expense-total").textContent = formatMoney(subscriptionTotal);
-      document.getElementById("total-expense-input").textContent = formatMoney(data.analysis.cash_flow.monthly_expenses);
-      document.getElementById("monthly-leftover").textContent = formatMoney(data.analysis.cash_flow.monthly_surplus);
-      document.getElementById("monthly-leftover").className = data.analysis.cash_flow.monthly_surplus >= 0 ? "positive-text" : "negative-text";
-      document.getElementById("plan-input-summary").hidden = false;
-      localStorage.setItem("lifepath_plan_generated", new Date().toISOString());
+      const record = savePlan(data, { regularExpenseTotal, subscriptionTotal, expenseCount: expenses.length, subscriptionCount: subscriptionExpenses.length });
+      displayPlan(record);
       status.textContent = `Included ${expenses.length} regular expense${expenses.length === 1 ? "" : "s"} and ${subscriptionExpenses.length} subscription${subscriptionExpenses.length === 1 ? "" : "s"}. Generated by ${data.coach.generated_by}. ${data.disclaimer}`;
     } catch (error) {
       status.textContent = error.message;
     }
   });
+
+  renderPlanHistory();
+  if (planHistory.length) displayPlan(planHistory[0], true);
 </script>
 {% endblock %}

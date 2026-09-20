@@ -23,6 +23,13 @@ def test_money_page_clarifies_monthly_income() -> None:
     assert "Yearly equivalent" in response.text
 
 
+def test_ai_coach_has_saved_plan_history() -> None:
+    response = client.get("/nemotron")
+    assert response.status_code == 200
+    assert "SAVED PLAN HISTORY" in response.text
+    assert "lifepath_plan_history_v1" in response.text
+
+
 def test_health() -> None:
     response = client.get("/health")
     assert response.status_code == 200

@@ -37,13 +37,6 @@
 </section>
 
 <section class="panel coach-generator" style="margin-top: 16px;">
-  <p class="label">PLAN CONTROLS</p>
-  <div id="plan-input-summary" class="plan-input-summary" hidden>
-    <div><span>Regular expenses</span><strong id="regular-expense-total">—</strong></div>
-    <div><span>Subscriptions</span><strong id="subscription-expense-total">—</strong></div>
-    <div><span>Total monthly spending</span><strong id="total-expense-input">—</strong></div>
-    <div><span>Left after spending</span><strong id="monthly-leftover">—</strong></div>
-  </div>
   <button id="generate-plan" class="primary-button" type="button">Generate My Plan</button>
   <p id="plan-status"></p>
 </section>
@@ -100,12 +93,6 @@
     }));
     document.getElementById("coach-risk").textContent = data.coach.risk_note;
     document.getElementById("coach-plan-meta").textContent = `${readablePlanDate(record.createdAt)} · ${data.coach.generated_by}`;
-    document.getElementById("regular-expense-total").textContent = formatMoney(record.regularExpenseTotal || 0);
-    document.getElementById("subscription-expense-total").textContent = formatMoney(record.subscriptionTotal || 0);
-    document.getElementById("total-expense-input").textContent = formatMoney(data.analysis.cash_flow.monthly_expenses);
-    document.getElementById("monthly-leftover").textContent = formatMoney(data.analysis.cash_flow.monthly_surplus);
-    document.getElementById("monthly-leftover").className = data.analysis.cash_flow.monthly_surplus >= 0 ? "positive-text" : "negative-text";
-    document.getElementById("plan-input-summary").hidden = false;
     if (restored) document.getElementById("plan-status").textContent = `Viewing the plan saved ${readablePlanDate(record.createdAt)}. Generate again whenever your finances change.`;
     renderPlanHistory();
   }

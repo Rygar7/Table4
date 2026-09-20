@@ -6,6 +6,14 @@
   <title>LifePath AI</title>
   <link rel="icon" type="image/png" href="{{ url_for('static', path='lifepath-logo.png') }}">
   <link rel="stylesheet" href="{{ url_for('static', path='style.css') }}">
+  <link rel="stylesheet" href="{{ url_for('static', path='professional.css') }}">
+  <script>
+    (() => {
+      const savedTheme = localStorage.getItem("lifepath-color-theme");
+      const preferredTheme = window.matchMedia("(prefers-color-scheme: dark)").matches ? "dark" : "light";
+      document.documentElement.dataset.colorTheme = savedTheme || preferredTheme;
+    })();
+  </script>
 </head>
 {% set page_theme = {
   '/': 'home',
@@ -58,12 +66,31 @@
 
       <a href="/nemotron" class="nav-ai {{ 'active' if current_path == '/nemotron' else '' }}">AI Coach</a>
     </nav>
+    <button class="theme-toggle" type="button" aria-label="Switch to dark mode" aria-pressed="false">
+      <span class="theme-toggle-icon" aria-hidden="true">☾</span>
+      <span class="theme-toggle-text">Dark</span>
+    </button>
   </header>
 
   <main>
     {% block content %}{% endblock %}
   </main>
   <script>
+    const themeToggle = document.querySelector(".theme-toggle");
+    const syncThemeToggle = () => {
+      const isDark = document.documentElement.dataset.colorTheme === "dark";
+      themeToggle.setAttribute("aria-label", `Switch to ${isDark ? "light" : "dark"} mode`);
+      themeToggle.setAttribute("aria-pressed", String(isDark));
+      themeToggle.querySelector(".theme-toggle-icon").textContent = isDark ? "☀" : "☾";
+      themeToggle.querySelector(".theme-toggle-text").textContent = isDark ? "Light" : "Dark";
+    };
+    syncThemeToggle();
+    themeToggle.addEventListener("click", () => {
+      const nextTheme = document.documentElement.dataset.colorTheme === "dark" ? "light" : "dark";
+      document.documentElement.dataset.colorTheme = nextTheme;
+      localStorage.setItem("lifepath-color-theme", nextTheme);
+      syncThemeToggle();
+    });
     document.querySelectorAll(".nav-group").forEach((group) => {
       group.addEventListener("toggle", () => {
         if (group.open) document.querySelectorAll(".nav-group").forEach((other) => { if (other !== group) other.open = false; });
@@ -71,6 +98,9 @@
     });
     document.addEventListener("click", (event) => {
       if (!event.target.closest(".nav-group")) document.querySelectorAll(".nav-group[open]").forEach((group) => group.open = false);
+    });
+    document.addEventListener("keydown", (event) => {
+      if (event.key === "Escape") document.querySelectorAll(".nav-group[open]").forEach((group) => { group.open = false; group.querySelector("summary").focus(); });
     });
   </script>
 </body>

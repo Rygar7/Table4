@@ -1,0 +1,288 @@
+/* Shared presentation layer. Existing page behavior and semantic status colors remain intact. */
+html { background: #f5f6f7; color-scheme: light; }
+body[class*="theme-"] {
+  --text: #202d39; --muted: #596774;
+  --green: #256653; --green-light: #256653; --green-deep: #194b3c;
+  --cyan: #20705b; --purple: #655786; --orange: #91602e; --blue: #3f638d; --coral: #b14049;
+  --theme-rgb: 37, 102, 83; --secondary-rgb: 63, 99, 141;
+  --panel: #fff; --panel-bright: #fff; --line: #dfe4e8; --line-bright: #bac8c1;
+  background: #f5f6f7; color: var(--text);
+  font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Arial, sans-serif;
+  font-size: 15px; line-height: 1.55;
+}
+/* Remove decorative lighting while retaining functional focus rings and chart markers. */
+body *, body *::before, body *::after { text-shadow: none !important; box-shadow: none !important; backdrop-filter: none !important; }
+body::before, body::after, main::before, .panel::before, .panel::after,
+.card::before, .goal-card::after { display: none; }
+header { padding: 14px max(24px, calc((100vw - 1184px) / 2)); gap: 48px; background: #fff; border-bottom: 1px solid var(--line); min-height: 80px; }
+.brand-mark { width: 38px; height: 38px; border: 0; border-radius: 8px; }
+.brand-mark img { width: 104px; height: 104px; transform: translate(-33px, -24px); }
+.brand-name { font-size: 17px; letter-spacing: -.4px; }
+.brand-name small { font-family: inherit; font-size: 10px; text-transform: none; letter-spacing: .2px; color: var(--muted); }
+.primary-nav { gap: 24px; min-width: 0; }
+.theme-toggle { display: inline-flex; align-items: center; justify-content: center; gap: 7px; margin-left: auto; min-width: 76px; min-height: 38px; padding: 7px 11px; color: var(--text); background: #fff; border: 1px solid var(--line); border-radius: 8px; font: 600 12px/1 -apple-system, BlinkMacSystemFont, "Segoe UI", Arial, sans-serif; cursor: pointer; }
+.theme-toggle:hover { background: #f0f3f2; border-color: #aebbb5; }
+.theme-toggle-icon { font-size: 16px; line-height: 1; }
+.primary-nav > a, .nav-group > summary { display: flex; align-items: center; height: 42px; padding: 8px 0; font-size: 14px; line-height: 24px; }
+.primary-nav > *, .nav-popover a { --tab-color: #256653; }
+.nav-group { margin: 0; }
+.nav-group summary span { font-size: 12px; }
+.nav-popover { background: #fff; border: 1px solid var(--line); border-radius: 10px; box-shadow: 0 8px 24px #202d3914 !important; }
+.nav-popover strong { color: var(--text); font-size: 14px; }
+.nav-popover small { color: var(--muted); font-size: 12px; }
+.nav-popover a:hover, .nav-popover a.active { background: #edf3f0; }
+main { max-width: 1184px; padding: 40px 24px 64px; }
+.simple-shell, .accounts-shell, .subscriptions-shell { max-width: none; }
+h1, h2, h3 { color: var(--text); letter-spacing: -.5px; line-height: 1.25; }
+h1, .compact-welcome h1 { font-size: clamp(28px, 3vw, 36px); font-weight: 650; max-width: 800px; }
+h2 { font-size: 20px; font-weight: 650; }
+h3 { font-size: 17px; }
+.welcome { margin-bottom: 28px; }
+.welcome p:not(.label) { font-size: 15px; line-height: 1.65; max-width: 690px; }
+.label, .step-number, .idea-number { font-family: inherit; }
+.label { color: var(--muted); font-size: 11px; font-weight: 650; letter-spacing: 1.1px; }
+.gradient-text, .ideas-gradient, .subscription-gradient, .calendar-gradient { color: var(--text); background: none; -webkit-text-fill-color: currentColor; }
+body a { color: var(--green); }
+.primary-nav > a { color: var(--muted); }
+.primary-nav > a.active { color: var(--green); }
+.brand { color: var(--text); }
+.panel, .card, .idea-card, .goal-card, .priority-card, .mini-stat, .mini-dashboard-card,
+.chart-panel, .checklist-panel, .ai-panel, .ai-calendar-panel, .plan-history-card, .plan-history-card.active {
+  background: #fff; border: 1px solid var(--line); border-radius: 12px;
+}
+.panel:hover, .card:hover { border-color: var(--line); }
+.panel, .card { padding: 24px; }
+.card[class*="accent-"], .gold-card, .purple-card, .coral-card, .blue-card { border-top: 1px solid var(--line); }
+.card h2, .mini-dashboard-card strong, .accent-cyan h2, .accent-purple h2, .accent-orange h2, .accent-blue h2,
+.gold-card strong, .purple-card strong, .coral-card strong, .blue-card strong { color: var(--text); font-variant-numeric: tabular-nums; }
+.card h2 { font-size: 30px; }
+.ai-panel p:not(.label), .idea-card p, .priority-card p, .visual-checklist p, .spending-row span, label, ul { color: var(--text); }
+.primary-button, .light-button { min-height: 44px; padding: 11px 18px; border-radius: 8px; font-size: 14px; font-weight: 600; line-height: 20px; text-align: center; transition: background .15s ease, border-color .15s ease; }
+body .primary-button { color: #fff; background: var(--green); border: 1px solid var(--green); }
+body .primary-button:hover { background: var(--green-deep); border-color: var(--green-deep); transform: none; }
+body .light-button { color: var(--green); background: #fff; border: 1px solid #c6d3cd; }
+body .light-button:hover { background: #edf3f0; }
+button:disabled { opacity: .6; cursor: default; }
+input, select { color: var(--text); background: #fff; border: 1px solid #c6cfd5; min-height: 44px; font-size: 15px; border-radius: 7px; }
+input::placeholder { color: #73818c; }
+select option { color: var(--text); background: #fff; }
+input:focus, select:focus { border-color: var(--green); outline: 2px solid #25665345; outline-offset: 1px; }
+:is(a, button, summary):focus-visible { outline: 2px solid var(--green); outline-offset: 4px; }
+.spending-row, .saved-row, .renewal-row, .upcoming-row { border-color: var(--line); }
+.spending-row strong { font-family: inherit; color: var(--text); }
+.security-note, .next-step, .sources-checked, .simple-badge, .privacy-badge, .coach-plan-meta,
+.goal-type-badge, .setup-count, .trend-badge.neutral { background: #eff3f1; border-color: #d5dfda; color: #365b4d; }
+.security-note { font-size: 13px; }
+.visual-banner, .mini-bars, .ai-orbit { display: none; }
+.money-cards { gap: 20px; }
+.setup-guide { margin-bottom: 24px; }
+.setup-step, .setup-step.complete, .friendly-field, .friendly-field.featured-field, .income-preview,
+.plan-input-summary > div, .ai-paycheck-allocation > div, .ai-calendar-priorities li,
+.paycheck-summary, .plan-history-metrics span { background: #f7f9f8; border-color: var(--line); }
+.setup-step:hover, .stock-category-grid button:hover { transform: none; border-color: var(--green); }
+.setup-step.complete { background: #edf4ef; }
+.setup-step-number, .step-number, .idea-number, .check-icon { background: #e8efeb; color: #256653; }
+.setup-step.complete .setup-step-number { color: #fff; background: var(--green); }
+.setup-step strong, .friendly-field > span { font-size: 14px; }
+.setup-step small, .friendly-field > small, .field-help, .form-explainer,
+.friendly-section-heading p:last-child, .setup-guide-heading p:last-child { font-size: 13px; }
+.setup-step small { min-height: 40px; }
+.setup-step > i { font-family: inherit; font-size: 11px; }
+.friendly-field { padding: 16px; }
+.friendly-field > small { font-weight: 400; }
+.friendly-form-grid { gap: 16px; }
+.income-preview { grid-column: 1 / -1; }
+.income-preview span, .income-preview > p:last-child { font-size: 13px; }
+.income-preview strong { font-size: 22px; color: var(--text); }
+.income-preview div { background: #fff; }
+.income-preview .input-warning { color: #805b19 !important; background: #fff5dd; }
+.progress, .goal-progress-track, .setup-progress, .category-track { background: #e7ece9; }
+.progress div, .goal-progress-track i, .setup-progress i { background: var(--green); }
+.goal-card.primary-goal { border-color: #93b2a5; }
+.goal-type-badge, .goal-date, .goal-progress-text, .goal-actions button { font-size: 12px; }
+.goal-card h2 { margin-top: 18px; }
+.empty-goals, .empty-plan-history, .empty-renewals { background: #f9fafb; color: var(--muted); border-color: var(--line); }
+.plan-input-summary span, .plan-history-card time, .plan-history-card > p, .plan-history-metrics span,
+.plan-history-card button, .coach-plan-meta, #coach-priorities span { font-size: 12px; }
+#coach-priorities strong { font-size: 15px; }
+#coach-priorities { gap: 16px; }
+.coach-response-heading { flex-wrap: wrap; }
+.plan-history-card-top { flex-wrap: wrap; }
+.plan-history-card-top span { color: #4c576d; background: #f0f2f6; font-size: 10px; }
+.plan-history-card.active { border-color: #93b2a5; }
+.plan-history-card button { color: var(--green); border-color: #c6d3cd; min-height: 40px; }
+.plan-history-card > p { min-height: 56px; }
+.stock-search { background: #fff; border-color: var(--line); }
+.quick-symbols button, .range-controls, .calendar-actions button { background: #f0f3f5; color: var(--text); border-color: var(--line); }
+.range-controls button { color: var(--muted); min-height: 32px; font-family: inherit; font-size: 12px; }
+.range-controls button.selected { color: #fff; background: var(--green); }
+.chart-line { filter: none; stroke-width: 3; }
+#chart-grid line { stroke: #dfe5e9; }
+#chart-fill-up stop { stop-color: #256653; }
+#chart-fill-down stop { stop-color: #b14049; }
+#chart-fill-up stop:first-child, #chart-fill-down stop:first-child { stop-opacity: .16; }
+#chart-points circle { stroke: #fff; }
+#chart-cursor line { stroke: #647680; stroke-width: 1.5; }
+#chart-cursor circle.cursor-halo { opacity: .12; }
+#chart-cursor circle.cursor-ring { fill: #fff; stroke: var(--green); filter: none; }
+#chart-cursor circle.cursor-ring.down { stroke: var(--coral); }
+.chart-tooltip { background: #fff; border-color: #b9c8c0; }
+.chart-tooltip strong { color: var(--text); }
+.chart-tooltip span { font-size: 11px; }
+.tooltip-market-data { border-color: var(--line); }
+.chart-axis { color: var(--muted); }
+.drag-hint { font-size: 12px; color: var(--muted); }
+.stock-category-grid button { background: #fff; border-color: var(--line); border-radius: 9px; }
+.stock-category-grid button.selected { background: #edf4ef; border-color: #739988; }
+.stock-category-grid button strong { font-size: 14px; }
+.stock-category-grid button small { font-size: 12px; }
+.stock-category-grid button.selected::after { font-size: 10px; }
+.cost-ring { background: conic-gradient(#256653 0 var(--ring-fill), #e7ece9 var(--ring-fill) 360deg); }
+.cost-ring::before { background: #fff; }
+.cost-ring strong { color: var(--text); }
+.renewal-info span, .renewal-badge, .renewal-actions button { font-size: 12px; }
+.renewal-badge.safe { color: #256653; background: #eaf3ed; }
+.renewal-badge.soon { color: #805b19; background: #fff5dd; }
+.renewal-badge.urgent, .renewal-badge.overdue { color: #a73541; background: #fcf0f1; border-color: #efd1d4; }
+.calendar-board { padding: 0; }
+.calendar-actions button:hover { color: var(--green); border-color: var(--green); }
+.calendar-weekdays, .calendar-day { background: #fff; border-color: var(--line); }
+.calendar-day.outside-month { opacity: 1; background: #f7f8fa; }
+.calendar-day.outside-month .calendar-day-number { color: #96a0a9; }
+.calendar-day.today { background: #eef4f0; }
+.calendar-day.today .calendar-day-number { background: var(--green); color: #fff; }
+.calendar-day-number, .calendar-weekdays span { font-family: inherit; font-size: 12px; }
+.calendar-event, .calendar-event b { font-size: 10px; }
+.calendar-event.payday { color: #315a83; background: #eaf0f7; }
+.calendar-event.bill { color: #a23842; background: #fbeef0; }
+.calendar-event.subscription { color: #625083; background: #f1edf7; }
+.calendar-event.goal { color: #256653; background: #eaf3ed; }
+.calendar-event.ai { color: #7b601f; background: #fbf4e3; border-color: #e6dcbf; }
+.calendar-help, .calendar-legend, .paycheck-form label, .calendar-event-form label, .paycheck-summary span,
+.paycheck-summary strong, .upcoming-row > div span, .upcoming-row button,
+.ai-calendar-priorities span, .ai-paycheck-allocation span, .small-inline-link { font-size: 12px; }
+.paycheck-summary strong, .upcoming-row time strong, .ai-paycheck-allocation strong, .small-inline-link { color: var(--green); }
+.upcoming-row time { background: #edf3f0; }
+.upcoming-row > div strong, .ai-calendar-priorities strong { font-size: 14px; }
+.ai-calendar-priorities li { border-left-color: var(--green); }
+.coach-layout { grid-template-columns: minmax(0, 1fr) 320px; align-items: start; }
+#coach-risk { border-top: 1px solid var(--line); margin-top: 24px; padding-top: 16px; font-size: 12px; color: var(--muted); }
+.coach-layout #coach-panel { grid-column: 1; grid-row: 1; }
+.coach-context { grid-column: 2; grid-row: 1; }
+.coach-context ul { font-size: 14px; }
+.coach-context p:last-child { color: var(--muted); font-size: 12px; }
+.coach-generator > p:not(.label) { color: var(--muted); }
+@media (max-width: 900px) {
+  header { flex-wrap: wrap; gap: 12px; padding: 12px 24px; }
+  .primary-nav { order: 3; flex-basis: 100%; gap: 24px; }
+  .theme-toggle { margin-left: auto; }
+  .coach-layout { grid-template-columns: 1fr; }
+  .coach-layout #coach-panel, .coach-context { grid-column: auto; grid-row: auto; }
+  .coach-layout #coach-panel { order: -1; }
+}
+@media (max-width: 650px) {
+  main { padding: 28px 16px 48px; }
+  .panel, .card { padding: 20px; }
+  .calendar-board { padding: 0; }
+  .primary-nav { gap: 16px; }
+  .primary-nav > a, .nav-group > summary { font-size: 13px; }
+  .setup-step small { min-height: 0; }
+  .income-preview { grid-column: auto; }
+  .calendar-bottom-grid { grid-template-columns: 1fr; }
+  .setup-guide-heading, .friendly-section-heading { gap: 12px; }
+  .spending-row { grid-template-columns: minmax(0, 1fr) auto auto; }
+  .spending-row .progress { display: none; }
+  .renewal-badge { white-space: normal; }
+}
+@media (max-width: 400px) {
+  header { padding: 12px 16px; }
+  .primary-nav { gap: 12px; }
+  .primary-nav > a, .nav-group > summary { font-size: 12px; }
+}
+@media (max-width: 540px) {
+  .calendar-event:is(.payday, .bill, .subscription, .goal, .ai) { background: currentColor; }
+}
+@media (prefers-reduced-motion: reduce) {
+  *, *::before, *::after { scroll-behavior: auto !important; transition: none !important; animation: none !important; }
+}
+
+/* Professional dark theme */
+html[data-color-theme="dark"] { background: #11171c; color-scheme: dark; }
+html[data-color-theme="dark"] body[class*="theme-"] {
+  --text: #edf1f3; --muted: #aab5bd;
+  --green: #70ad97; --green-light: #70ad97; --green-deep: #5c9984;
+  --panel: #182128; --panel-bright: #182128; --line: #334049; --line-bright: #52636d;
+  background: #11171c; color: var(--text);
+}
+html[data-color-theme="dark"] header,
+html[data-color-theme="dark"] .panel,
+html[data-color-theme="dark"] .card,
+html[data-color-theme="dark"] .idea-card,
+html[data-color-theme="dark"] .goal-card,
+html[data-color-theme="dark"] .priority-card,
+html[data-color-theme="dark"] .mini-stat,
+html[data-color-theme="dark"] .mini-dashboard-card,
+html[data-color-theme="dark"] .chart-panel,
+html[data-color-theme="dark"] .checklist-panel,
+html[data-color-theme="dark"] .ai-panel,
+html[data-color-theme="dark"] .ai-calendar-panel,
+html[data-color-theme="dark"] .plan-history-card,
+html[data-color-theme="dark"] .stock-search,
+html[data-color-theme="dark"] .stock-category-grid button,
+html[data-color-theme="dark"] .calendar-weekdays,
+html[data-color-theme="dark"] .calendar-day,
+html[data-color-theme="dark"] input,
+html[data-color-theme="dark"] select,
+html[data-color-theme="dark"] select option,
+html[data-color-theme="dark"] .theme-toggle,
+html[data-color-theme="dark"] .nav-popover { background: #182128; color: var(--text); border-color: var(--line); }
+html[data-color-theme="dark"] .theme-toggle:hover,
+html[data-color-theme="dark"] .nav-popover a:hover,
+html[data-color-theme="dark"] .nav-popover a.active { background: #223029; }
+html[data-color-theme="dark"] .setup-step,
+html[data-color-theme="dark"] .setup-step.complete,
+html[data-color-theme="dark"] .friendly-field,
+html[data-color-theme="dark"] .friendly-field.featured-field,
+html[data-color-theme="dark"] .income-preview,
+html[data-color-theme="dark"] .plan-input-summary > div,
+html[data-color-theme="dark"] .ai-paycheck-allocation > div,
+html[data-color-theme="dark"] .ai-calendar-priorities li,
+html[data-color-theme="dark"] .paycheck-summary,
+html[data-color-theme="dark"] .plan-history-metrics span,
+html[data-color-theme="dark"] .security-note,
+html[data-color-theme="dark"] .next-step,
+html[data-color-theme="dark"] .sources-checked,
+html[data-color-theme="dark"] .simple-badge,
+html[data-color-theme="dark"] .privacy-badge,
+html[data-color-theme="dark"] .coach-plan-meta,
+html[data-color-theme="dark"] .goal-type-badge,
+html[data-color-theme="dark"] .setup-count,
+html[data-color-theme="dark"] .trend-badge.neutral,
+html[data-color-theme="dark"] .range-controls,
+html[data-color-theme="dark"] .quick-symbols button,
+html[data-color-theme="dark"] .calendar-actions button,
+html[data-color-theme="dark"] .upcoming-row time { background: #202a31; color: var(--text); border-color: var(--line); }
+html[data-color-theme="dark"] .setup-step.complete,
+html[data-color-theme="dark"] .stock-category-grid button.selected,
+html[data-color-theme="dark"] .calendar-day.today { background: #21362f; }
+html[data-color-theme="dark"] .income-preview div,
+html[data-color-theme="dark"] .cost-ring::before,
+html[data-color-theme="dark"] .chart-tooltip { background: #182128; }
+html[data-color-theme="dark"] .calendar-day.outside-month,
+html[data-color-theme="dark"] .empty-goals,
+html[data-color-theme="dark"] .empty-plan-history,
+html[data-color-theme="dark"] .empty-renewals { background: #151d23; }
+html[data-color-theme="dark"] .progress,
+html[data-color-theme="dark"] .goal-progress-track,
+html[data-color-theme="dark"] .setup-progress,
+html[data-color-theme="dark"] .category-track { background: #344149; }
+html[data-color-theme="dark"] #chart-grid line { stroke: #334049; }
+html[data-color-theme="dark"] #chart-cursor circle.cursor-ring { fill: #182128; }
+html[data-color-theme="dark"] .light-button { color: var(--green); background: transparent; border-color: #52636d; }
+html[data-color-theme="dark"] .light-button:hover { background: #223029; }
+html[data-color-theme="dark"] input::placeholder { color: #87949d; }
+html[data-color-theme="dark"] .plan-history-card-top span { color: #c3cbd1; background: #283139; }
+html[data-color-theme="dark"] .renewal-badge.safe { color: #96cbb8; background: #20352e; }
+html[data-color-theme="dark"] .renewal-badge.soon { color: #e5c47e; background: #392f1d; }
+html[data-color-theme="dark"] .renewal-badge.urgent,
+html[data-color-theme="dark"] .renewal-badge.overdue { color: #ed9fa7; background: #3a2428; border-color: #63353c; }

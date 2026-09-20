@@ -286,3 +286,74 @@ html[data-color-theme="dark"] .renewal-badge.safe { color: #96cbb8; background: 
 html[data-color-theme="dark"] .renewal-badge.soon { color: #e5c47e; background: #392f1d; }
 html[data-color-theme="dark"] .renewal-badge.urgent,
 html[data-color-theme="dark"] .renewal-badge.overdue { color: #ed9fa7; background: #3a2428; border-color: #63353c; }
+
+/* Branded wealth-management layer: restrained depth, section identity, and clearer hierarchy. */
+body.theme-home, body.theme-ai { --page-accent: #276b56; --page-soft: #e8f1ed; --page-rgb: 39, 107, 86; }
+body.theme-money, body.theme-accounts, body.theme-subscriptions { --page-accent: #426b82; --page-soft: #e9f0f4; --page-rgb: 66, 107, 130; }
+body.theme-goals, body.theme-calendar { --page-accent: #96703f; --page-soft: #f4eee4; --page-rgb: 150, 112, 63; }
+body.theme-stocks, body.theme-ideas { --page-accent: #605b87; --page-soft: #efedf5; --page-rgb: 96, 91, 135; }
+body[class*="theme-"] { background-image: linear-gradient(180deg, rgba(var(--page-rgb), .035), transparent 360px); }
+.brand-mark { box-shadow: 0 5px 14px rgba(30, 43, 51, .16) !important; }
+.label { display: flex; align-items: center; gap: 8px; color: var(--page-accent); }
+.label::before { width: 18px; height: 2px; background: var(--page-accent); border-radius: 99px; content: ""; }
+.welcome { position: relative; overflow: hidden; min-height: 148px; padding: 28px 30px; background: linear-gradient(120deg, var(--page-soft), #fff 68%); border: 1px solid rgba(var(--page-rgb), .15); border-radius: 16px; }
+.welcome::after { position: absolute; top: -66px; right: 14%; width: 190px; height: 190px; border: 34px solid rgba(var(--page-rgb), .055); border-radius: 50%; content: ""; pointer-events: none; }
+.welcome > * { position: relative; z-index: 1; }
+.welcome h1 { font-size: clamp(32px, 4vw, 43px); letter-spacing: -1.25px; }
+.welcome p:not(.label) { margin-top: 10px; }
+.primary-button { box-shadow: 0 5px 13px rgba(32, 64, 54, .14) !important; }
+.primary-button:hover { box-shadow: 0 7px 17px rgba(32, 64, 54, .2) !important; transform: translateY(-1px); }
+.panel, .card, .idea-card, .goal-card, .mini-stat, .mini-dashboard-card, .chart-panel,
+.checklist-panel, .ai-calendar-panel, .plan-history-card { box-shadow: 0 8px 24px rgba(31, 45, 54, .055) !important; transition: border-color .18s ease, transform .18s ease, box-shadow .18s ease; }
+.panel:hover, .card:hover, .idea-card:hover, .goal-card:hover { box-shadow: 0 11px 28px rgba(31, 45, 54, .08) !important; }
+.card:hover, .mini-dashboard-card:hover { transform: translateY(-2px); }
+.money-cards .card, .calendar-stats .mini-dashboard-card, .subscription-stats .mini-dashboard-card { border-top: 3px solid var(--page-accent); }
+.money-cards .card:nth-child(2), .calendar-stats .mini-dashboard-card:nth-child(2), .subscription-stats .mini-dashboard-card:nth-child(2) { border-top-color: #58799c; }
+.money-cards .card:nth-child(3), .calendar-stats .mini-dashboard-card:nth-child(3), .subscription-stats .mini-dashboard-card:nth-child(3) { border-top-color: #a56b4d; }
+.money-cards .card:nth-child(4), .calendar-stats .mini-dashboard-card:nth-child(4), .subscription-stats .mini-dashboard-card:nth-child(4) { border-top-color: #776895; }
+.visual-banner { display: flex; min-height: 92px; background: linear-gradient(105deg, #f1f5f3, #f5f1e9); border: 1px solid var(--line); border-radius: 14px; }
+.mini-bars { display: flex; height: 48px; }
+.mini-bars i { background: linear-gradient(180deg, #709b8b, #385f52); border-radius: 3px 3px 1px 1px; }
+.eyebrow-dot { box-shadow: none !important; color: #8d724b; background: #8d724b; }
+.setup-step { border-top: 3px solid rgba(var(--page-rgb), .35); }
+.setup-step:nth-child(2) { border-top-color: #7d9aab; }
+.setup-step:nth-child(3) { border-top-color: #b4986e; }
+.setup-step:nth-child(4) { border-top-color: #8e83a8; }
+.setup-step:nth-child(5) { border-top-color: #7c9a72; }
+.ai-panel { background: linear-gradient(135deg, rgba(39, 107, 86, .065), #fff 48%); border-left: 4px solid #4b806e; }
+.coach-response-heading { padding-bottom: 14px; border-bottom: 1px solid var(--line); }
+#coach-summary { font-size: 16px; line-height: 1.7; }
+#coach-priorities { gap: 12px; padding-left: 28px; }
+#coach-priorities li { padding: 15px 17px 15px 12px; background: #f7f9f8; border: 1px solid var(--line); border-radius: 10px; }
+#coach-priorities li::marker { color: var(--green); font-weight: 750; }
+#coach-priorities strong { font-size: 14px; }
+#coach-priorities span { margin-top: 6px; font-size: 12px; line-height: 1.6; }
+.coach-context { border-top: 3px solid #a3885e; }
+.coach-generator { border-top: 3px solid #638b7d; }
+.plan-history-panel { border-top: 3px solid #7185a0; }
+.stock-category-grid button { border-top: 3px solid rgba(var(--page-rgb), .22); }
+.chart-panel { border-top: 3px solid var(--page-accent); }
+.nav-group.active-group > summary, .primary-nav > a.active { color: var(--page-accent); }
+
+html[data-color-theme="dark"] body.theme-home, html[data-color-theme="dark"] body.theme-ai { --page-accent: #82b8a4; --page-soft: #1c2b27; }
+html[data-color-theme="dark"] body.theme-money, html[data-color-theme="dark"] body.theme-accounts, html[data-color-theme="dark"] body.theme-subscriptions { --page-accent: #85aec3; --page-soft: #1c2930; }
+html[data-color-theme="dark"] body.theme-goals, html[data-color-theme="dark"] body.theme-calendar { --page-accent: #c5a475; --page-soft: #2d2921; }
+html[data-color-theme="dark"] body.theme-stocks, html[data-color-theme="dark"] body.theme-ideas { --page-accent: #aaa1ca; --page-soft: #262532; }
+html[data-color-theme="dark"] .welcome { background: linear-gradient(120deg, var(--page-soft), #182128 70%); border-color: rgba(var(--page-rgb), .34); }
+html[data-color-theme="dark"] .welcome::after { border-color: rgba(var(--page-rgb), .12); }
+html[data-color-theme="dark"] .visual-banner { background: linear-gradient(105deg, #1d2a27, #28251f); }
+html[data-color-theme="dark"] .ai-panel { background: linear-gradient(135deg, rgba(87, 145, 124, .12), #182128 48%); }
+html[data-color-theme="dark"] #coach-priorities li { background: #202a2f; }
+html[data-color-theme="dark"] .panel,
+html[data-color-theme="dark"] .card,
+html[data-color-theme="dark"] .idea-card,
+html[data-color-theme="dark"] .goal-card,
+html[data-color-theme="dark"] .mini-stat,
+html[data-color-theme="dark"] .mini-dashboard-card,
+html[data-color-theme="dark"] .chart-panel { box-shadow: 0 9px 25px rgba(0, 0, 0, .18) !important; }
+
+@media (max-width: 650px) {
+  .welcome { min-height: 0; padding: 22px 20px; }
+  .welcome::after { right: -90px; }
+  .visual-banner { padding: 18px 20px; }
+}

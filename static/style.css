@@ -1424,7 +1424,7 @@ main::before {
 .nav-plan { --tab-color: #ffd166; }
 .nav-invest { --tab-color: #ff6f91; }
 .nav-ai { --tab-color: #d182ff; }
-.nav-group { position: relative; }
+.nav-group { position: relative; margin-top: 0; color: inherit; }
 .nav-group > summary {
   position: relative;
   display: flex;
@@ -1471,6 +1471,7 @@ main::before {
 }
 .nav-popover a {
   display: block;
+  margin-top: 0;
   padding: 11px 12px;
   color: var(--text);
   border-radius: 9px;

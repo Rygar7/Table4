@@ -312,6 +312,9 @@ body[class*="theme-"] { background-image: linear-gradient(180deg, rgba(var(--pag
 .money-cards .card:nth-child(3), .calendar-stats .mini-dashboard-card:nth-child(3), .subscription-stats .mini-dashboard-card:nth-child(3) { border-top-color: #a56b4d; }
 .money-cards .card:nth-child(4), .calendar-stats .mini-dashboard-card:nth-child(4), .subscription-stats .mini-dashboard-card:nth-child(4) { border-top-color: #776895; }
 .visual-banner { display: flex; min-height: 92px; background: linear-gradient(105deg, #f1f5f3, #f5f1e9); border: 1px solid var(--line); border-radius: 14px; }
+.focus-kicker { margin-bottom: 4px; color: var(--page-accent) !important; font-size: 10px !important; font-weight: 700; letter-spacing: 1.25px; }
+.focus-link { flex: 0 0 auto; padding: 9px 12px; color: var(--page-accent); font-size: 13px; font-weight: 700; text-decoration: none; border: 1px solid rgba(var(--page-rgb), .25); border-radius: 8px; }
+.focus-link:hover { background: rgba(var(--page-rgb), .07); }
 .mini-bars { display: flex; height: 48px; }
 .mini-bars i { background: linear-gradient(180deg, #709b8b, #385f52); border-radius: 3px 3px 1px 1px; }
 .eyebrow-dot { box-shadow: none !important; color: #8d724b; background: #8d724b; }
@@ -320,9 +323,20 @@ body[class*="theme-"] { background-image: linear-gradient(180deg, rgba(var(--pag
 .setup-step:nth-child(3) { border-top-color: #b4986e; }
 .setup-step:nth-child(4) { border-top-color: #8e83a8; }
 .setup-step:nth-child(5) { border-top-color: #7c9a72; }
+.setup-guide.is-complete { display: grid; grid-template-columns: minmax(0, 1fr) auto; align-items: center; gap: 24px; padding: 22px 24px; border-left: 4px solid var(--green); }
+.setup-guide.is-complete .setup-guide-heading { margin: 0; }
+.setup-guide.is-complete .setup-count { color: var(--green); background: #e8f1ed; }
+.setup-guide.is-complete .setup-progress, .setup-guide.is-complete .setup-steps { display: none; }
+.setup-guide.is-complete .setup-next-action { margin: 0; }
 .ai-panel { background: linear-gradient(135deg, rgba(39, 107, 86, .065), #fff 48%); border-left: 4px solid #4b806e; }
 .coach-response-heading { padding-bottom: 14px; border-bottom: 1px solid var(--line); }
 #coach-summary { font-size: 16px; line-height: 1.7; }
+.coach-top-action { margin: 22px 0 16px; padding: 18px 20px; background: linear-gradient(120deg, #e7f1ec, #f7faf8); border: 1px solid #bfd3ca; border-left: 4px solid var(--green); border-radius: 11px; }
+.coach-top-action > span { display: block; margin-bottom: 6px; color: var(--green); font-size: 10px; font-weight: 750; letter-spacing: 1.15px; }
+.coach-top-action > strong { display: block; font-size: 17px; line-height: 1.4; }
+.coach-top-action details, #coach-priorities details { margin-top: 9px; }
+.coach-top-action summary, #coach-priorities summary { width: max-content; color: var(--green); font-size: 12px; font-weight: 650; cursor: pointer; }
+.coach-top-action details p, #coach-priorities details p { margin: 8px 0 0; color: var(--muted); font-size: 12px; line-height: 1.6; }
 #coach-priorities { gap: 12px; padding-left: 28px; }
 #coach-priorities li { padding: 15px 17px 15px 12px; background: #f7f9f8; border: 1px solid var(--line); border-radius: 10px; }
 #coach-priorities li::marker { color: var(--green); font-weight: 750; }
@@ -344,6 +358,8 @@ html[data-color-theme="dark"] .welcome::after { border-color: rgba(var(--page-rg
 html[data-color-theme="dark"] .visual-banner { background: linear-gradient(105deg, #1d2a27, #28251f); }
 html[data-color-theme="dark"] .ai-panel { background: linear-gradient(135deg, rgba(87, 145, 124, .12), #182128 48%); }
 html[data-color-theme="dark"] #coach-priorities li { background: #202a2f; }
+html[data-color-theme="dark"] .coach-top-action { background: linear-gradient(120deg, #20362f, #1c2825); border-color: #3f6658; }
+html[data-color-theme="dark"] .setup-guide.is-complete .setup-count { background: #20362f; }
 html[data-color-theme="dark"] .panel,
 html[data-color-theme="dark"] .card,
 html[data-color-theme="dark"] .idea-card,
@@ -356,4 +372,7 @@ html[data-color-theme="dark"] .chart-panel { box-shadow: 0 9px 25px rgba(0, 0, 0
   .welcome { min-height: 0; padding: 22px 20px; }
   .welcome::after { right: -90px; }
   .visual-banner { padding: 18px 20px; }
+  .visual-banner { align-items: flex-start; }
+  .focus-link { margin-top: 4px; }
+  .setup-guide.is-complete { grid-template-columns: 1fr; }
 }

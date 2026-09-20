@@ -26,6 +26,11 @@
     <div class="coach-response-heading"><p class="label">COACH RESPONSE</p><span id="coach-plan-meta" class="coach-plan-meta">No saved plan</span></div>
     <h2 id="coach-heading">Your AI plan will appear here.</h2>
     <p id="coach-summary">Save your money information and goal, then generate a plan.</p>
+    <div id="coach-top-action" class="coach-top-action" hidden>
+      <span>TOP ACTION</span>
+      <strong id="coach-top-action-title"></strong>
+      <details><summary>Why this matters</summary><p id="coach-top-action-reason"></p></details>
+    </div>
     <ol id="coach-priorities"></ol>
     <p id="coach-risk"></p>
   </article>
@@ -78,14 +83,22 @@
   function displayPlan(record, restored = false) {
     const data = record.data;
     activePlanId = record.id;
-    document.getElementById("coach-heading").textContent = data.analysis.goal_name;
+    document.getElementById("coach-heading").textContent = `Plan for ${data.analysis.goal_name}`;
     document.getElementById("coach-summary").textContent = data.coach.summary;
     const priorities = document.getElementById("coach-priorities");
-    priorities.replaceChildren(...data.coach.priorities.map((item) => {
+    const topAction = data.coach.priorities[0];
+    const topActionCard = document.getElementById("coach-top-action");
+    topActionCard.hidden = !topAction;
+    document.getElementById("coach-top-action-title").textContent = topAction?.title || "";
+    document.getElementById("coach-top-action-reason").textContent = topAction?.reason || "";
+    priorities.start = 2;
+    priorities.replaceChildren(...data.coach.priorities.slice(1).map((item) => {
       const entry = document.createElement("li");
       const title = document.createElement("strong"); title.textContent = item.title;
-      const reason = document.createElement("span"); reason.textContent = item.reason;
-      entry.append(title, reason); return entry;
+      const detail = document.createElement("details");
+      const summary = document.createElement("summary"); summary.textContent = "Why this matters";
+      const reason = document.createElement("p"); reason.textContent = item.reason;
+      detail.append(summary, reason); entry.append(title, detail); return entry;
     }));
     document.getElementById("coach-risk").textContent = data.coach.risk_note;
     document.getElementById("coach-plan-meta").textContent = `${readablePlanDate(record.createdAt)} · ${data.coach.generated_by}`;

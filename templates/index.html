@@ -14,11 +14,9 @@
 <section class="visual-banner">
   <div class="visual-copy">
     <span class="eyebrow-dot cyan-dot"></span>
-    <div><strong>Your financial picture, in one place</strong><span>Budget · Credit · Goals · Markets</span></div>
+    <div><span class="focus-kicker">TODAY'S FOCUS</span><strong id="home-focus-title">Finish your setup to unlock a recommendation</strong><span id="home-focus-detail">LifePath AI will surface the most important next step here.</span></div>
   </div>
-  <div class="mini-bars" aria-label="Decorative financial growth chart">
-    <i style="height: 28%"></i><i style="height: 46%"></i><i style="height: 38%"></i><i style="height: 72%"></i><i style="height: 90%"></i>
-  </div>
+  <a id="home-focus-link" class="focus-link" href="/nemotron">View plan <span aria-hidden="true">→</span></a>
 </section>
 
 <section class="panel setup-guide" aria-labelledby="setup-title">
@@ -92,12 +90,22 @@
   const savedGoal = readSaved("lifepath_goal", null);
   const savedCalendar = readSaved("lifepath_calendar_v2", {});
   const savedSubscriptions = readSaved("lifepath_subscriptions_v1", []);
+  const savedPlanHistory = readSaved("lifepath_plan_history_v1", []);
   const gross = Number(savedMoney.income?.gross_income || 0);
   const taxRate = Number(savedMoney.income?.income_tax_rate || 0) + Number(savedMoney.income?.payroll_tax_rate || 0);
   const takeHome = gross * (1 - Math.min(taxRate, 95) / 100);
   const expenseTotal = (savedMoney.expenses || []).reduce((sum, item) => sum + Number(item.amount || 0), 0);
   const subscriptionTotal = savedSubscriptions.reduce((sum, item) => sum + subscriptionMonthly(item), 0);
   const totalSpending = expenseTotal + subscriptionTotal;
+
+  const latestPlan = Array.isArray(savedPlanHistory) ? savedPlanHistory[0] : null;
+  const topPriority = latestPlan?.data?.coach?.priorities?.[0];
+  if (topPriority?.title) {
+    document.getElementById("home-focus-title").textContent = topPriority.title;
+    document.getElementById("home-focus-detail").textContent = `Top recommendation from your latest ${latestPlan.data.analysis?.goal_name || "financial"} plan.`;
+    document.getElementById("home-ai-heading").textContent = `Latest plan for ${latestPlan.data.analysis?.goal_name || "your goal"}`;
+    document.getElementById("home-ai-summary").textContent = latestPlan.data.coach?.summary || "Your latest plan is ready to review.";
+  }
 
   document.getElementById("home-income").textContent = gross ? formatHomeMoney(takeHome) : "—";
   document.getElementById("home-expenses").textContent = totalSpending ? formatHomeMoney(totalSpending) : "—";
@@ -136,6 +144,12 @@
   const nextKey = stepOrder.find(step => !setupState[step]); const nextAction = document.getElementById("setup-next-action");
   const nextLabels = { income: ["Add income details", "/money"], expenses: ["Add monthly expenses", "/money"], goal: ["Choose your first goal", "/goals"], payday: ["Set your next payday", "/calendar"], plan: ["Generate your AI plan", "/nemotron"] };
   if (nextKey) { nextAction.textContent = nextLabels[nextKey][0]; nextAction.href = nextLabels[nextKey][1]; }
-  else { nextAction.textContent = "Setup complete — review your plan"; nextAction.href = "/nemotron"; document.getElementById("setup-message").textContent = "You are all set. Update any section whenever your situation changes."; }
+  else {
+    document.querySelector(".setup-guide").classList.add("is-complete");
+    document.getElementById("setup-title").textContent = "Your financial profile is ready";
+    document.getElementById("setup-count").textContent = "Ready";
+    nextAction.textContent = "Review your plan"; nextAction.href = "/nemotron";
+    document.getElementById("setup-message").textContent = "Income, expenses, goal, payday, and AI plan are connected.";
+  }
 </script>
 {% endblock %}

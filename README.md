@@ -3,7 +3,7 @@ Finance app with Nemotron
 
 ## LifePath AI backend
 
-The backend uses Python and FastAPI for deterministic financial calculations. NVIDIA
+The backend uses Python and FastAPI for financial calculations. NVIDIA
 Nemotron receives only verified summaries and returns structured educational guidance.
 
 ### Run locally

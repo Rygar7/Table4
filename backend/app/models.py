@@ -190,25 +190,6 @@ class MarketNewsItem(BaseModel):
     symbols: list[str]
 
 
-class PortfolioExample(BaseModel):
-    name: str
-    risk_level: str
-    stock_percent: int
-    bond_percent: int
-    description: str
-    source_url: str
-
-
-class MarketResearch(BaseModel):
-    market_summary: str
-    research_ideas: list[str]
-    trends: list[MarketTrend]
-    portfolio_examples: list[PortfolioExample]
-    news: list[MarketNewsItem]
-    generated_by: str
-    disclaimer: str
-
-
 class SuggestionRequest(BaseModel):
     time_horizon: Literal["under_3_years", "3_to_7_years", "over_7_years"]
     risk_comfort: RiskComfort

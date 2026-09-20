@@ -624,14 +624,6 @@ details a {
   border-radius: 10px;
 }
 
-.accounts-shell {
-  max-width: 960px;
-}
-
-.account-section {
-  margin-bottom: 14px;
-}
-
 .section-heading,
 .section-heading > div {
   display: flex;
@@ -648,101 +640,6 @@ details a {
 .section-heading p:not(.step-number) {
   color: var(--muted);
   font-size: 13px;
-}
-
-.security-note {
-  margin: 16px 0;
-  padding: 10px 12px;
-  color: #cce8d5;
-  font-size: 13px;
-  background: rgba(85, 242, 138, 0.07);
-  border-left: 3px solid var(--green);
-  border-radius: 6px;
-}
-
-.inline-form,
-.data-form {
-  display: grid;
-  max-width: none;
-  grid-template-columns: repeat(3, 1fr) auto;
-  align-items: end;
-  gap: 12px;
-}
-
-.data-form {
-  grid-template-columns: repeat(3, 1fr);
-}
-
-.data-form .add-button {
-  min-height: 43px;
-}
-
-.loan-form,
-.optional-form {
-  grid-template-columns: repeat(4, 1fr);
-}
-
-.optional-form {
-  grid-template-columns: repeat(3, 1fr);
-}
-
-.add-button {
-  white-space: nowrap;
-}
-
-.saved-list {
-  margin-top: 14px;
-  border-top: 1px solid var(--line);
-}
-
-.empty-list {
-  padding-top: 14px;
-  color: var(--muted);
-  font-size: 13px;
-}
-
-.saved-row {
-  display: flex;
-  align-items: center;
-  justify-content: space-between;
-  gap: 12px;
-  padding: 11px 0;
-  border-bottom: 1px solid rgba(105, 255, 157, 0.1);
-}
-
-.saved-row button {
-  color: var(--muted);
-  background: transparent;
-  border: 0;
-  cursor: pointer;
-}
-
-.saved-row button:hover {
-  color: var(--green-light);
-}
-
-.metric-line {
-  color: var(--green-light);
-}
-
-.priority-list {
-  display: grid;
-  gap: 12px;
-}
-
-.priority-card {
-  display: grid;
-  grid-template-columns: 42px 1fr;
-  gap: 16px;
-  padding: 20px;
-  background: rgba(11, 28, 17, 0.9);
-  border: 1px solid var(--line);
-  border-radius: 14px;
-}
-
-.priority-card p {
-  margin: 7px 0;
-  color: #c8d8cd;
 }
 
 @media (max-width: 850px) {
@@ -786,12 +683,6 @@ details a {
     grid-column: 1 / -1;
   }
 
-  .inline-form,
-  .data-form,
-  .loan-form,
-  .optional-form {
-    grid-template-columns: 1fr 1fr;
-  }
 }
 
 @media (max-width: 500px) {
@@ -828,12 +719,6 @@ details a {
     flex-direction: column;
   }
 
-  .inline-form,
-  .data-form,
-  .loan-form,
-  .optional-form {
-    grid-template-columns: 1fr;
-  }
 }
 
 /* Every main tab has its own color identity. */
@@ -856,11 +741,6 @@ details a {
   --green: #a987ff; --green-light: #dfd0ff; --green-deep: #7043d1;
   --theme-rgb: 169, 135, 255; --secondary-rgb: 99, 168, 255; --theme-midnight: #150c27;
   --line: rgba(169, 135, 255, 0.22); --line-bright: rgba(169, 135, 255, 0.52);
-}
-.theme-accounts {
-  --green: #ffb65c; --green-light: #ffe0b1; --green-deep: #b56313;
-  --theme-rgb: 255, 182, 92; --secondary-rgb: 255, 111, 145; --theme-midnight: #221306;
-  --line: rgba(255, 182, 92, 0.22); --line-bright: rgba(255, 182, 92, 0.52);
 }
 .theme-subscriptions {
   --green: #ffd166; --green-light: #ffecb0; --green-deep: #a66e00;
@@ -1208,28 +1088,6 @@ main::before {
 
 @media (max-width: 700px) {
   .goal-grid { grid-template-columns: 1fr; }
-}
-
-/* Transparent inputs used by the AI savings plan */
-.plan-input-summary {
-  display: grid;
-  margin: 20px 0;
-  grid-template-columns: repeat(4, 1fr);
-  gap: 10px;
-}
-.plan-input-summary[hidden] { display: none; }
-.plan-input-summary > div {
-  padding: 14px;
-  background: rgba(var(--theme-rgb), .07);
-  border: 1px solid rgba(var(--theme-rgb), .16);
-  border-radius: 12px;
-}
-.plan-input-summary span, .plan-input-summary strong { display: block; }
-.plan-input-summary span { margin-bottom: 7px; color: var(--muted); font-size: 10px; }
-.plan-input-summary strong { color: var(--green-light); font-size: 17px; }
-
-@media (max-width: 760px) {
-  .plan-input-summary { grid-template-columns: 1fr 1fr; }
 }
 
 /* Interactive stock chart controls */

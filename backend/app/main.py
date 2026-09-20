@@ -10,8 +10,6 @@ from .finance import analyze_profile
 from .market import (
     MarketDataError,
     calculate_stock_metrics,
-    get_market_news,
-    get_market_trends,
     get_instrument_trends,
     get_news_for_symbols,
     get_stock_history,
@@ -21,7 +19,6 @@ from .models import (
     FinancialAnalysis,
     FinancialProfile,
     MarketNewsItem,
-    MarketResearch,
     MarketTrend,
     PlanResponse,
     StockHistory,
@@ -33,7 +30,6 @@ from .models import (
     TaxEstimate,
     TaxEstimateRequest,
 )
-from .market_research import create_market_research
 from .nemotron import create_coach
 from .stock_coach import create_stock_insight
 from .trade_ideas import INSTRUMENTS, candidate_symbols, create_suggested_trades
@@ -147,16 +143,6 @@ def tax_estimate(payload: TaxEstimateRequest) -> TaxEstimate:
         disclaimer="Educational 2026 estimate using simplified single-filer assumptions. Credits, dependents, deductions, local taxes, and special state rules are not included.",
         sources=["IRS 2026 inflation adjustments", "IRS Topic 751", "Tax Foundation 2026 state brackets", "Zippopotam.us ZIP lookup"],
     )
-
-
-@app.get("/api/v1/market/research", response_model=MarketResearch)
-def market_research() -> MarketResearch:
-    try:
-        trends = [MarketTrend.model_validate(item) for item in get_market_trends()]
-        news = [MarketNewsItem.model_validate(item) for item in get_market_news()]
-        return create_market_research(trends, news)
-    except MarketDataError as exc:
-        raise HTTPException(status_code=502, detail=str(exc)) from exc
 
 
 @app.post("/api/v1/market/suggestions", response_model=SuggestedTrades)

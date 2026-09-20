@@ -32,7 +32,7 @@ header { padding: 14px max(24px, calc((100vw - 1184px) / 2)); gap: 48px; backgro
 .nav-popover small { color: var(--muted); font-size: 12px; }
 .nav-popover a:hover, .nav-popover a.active { background: #edf3f0; }
 main { max-width: 1184px; padding: 40px 24px 64px; }
-.simple-shell, .accounts-shell, .subscriptions-shell { max-width: none; }
+.simple-shell, .subscriptions-shell { max-width: none; }
 h1, h2, h3 { color: var(--text); letter-spacing: -.5px; line-height: 1.25; }
 h1, .compact-welcome h1 { font-size: clamp(28px, 3vw, 36px); font-weight: 650; max-width: 800px; }
 h2 { font-size: 20px; font-weight: 650; }
@@ -46,7 +46,7 @@ body a { color: var(--green); }
 .primary-nav > a { color: var(--muted); }
 .primary-nav > a.active { color: var(--green); }
 .brand { color: var(--text); }
-.panel, .card, .idea-card, .goal-card, .priority-card, .mini-stat, .mini-dashboard-card,
+.panel, .card, .idea-card, .goal-card, .mini-stat, .mini-dashboard-card,
 .chart-panel, .checklist-panel, .ai-panel, .ai-calendar-panel, .plan-history-card, .plan-history-card.active {
   background: #fff; border: 1px solid var(--line); border-radius: 12px;
 }
@@ -56,7 +56,7 @@ body a { color: var(--green); }
 .card h2, .mini-dashboard-card strong, .accent-cyan h2, .accent-purple h2, .accent-orange h2, .accent-blue h2,
 .gold-card strong, .purple-card strong, .coral-card strong, .blue-card strong { color: var(--text); font-variant-numeric: tabular-nums; }
 .card h2 { font-size: 30px; }
-.ai-panel p:not(.label), .idea-card p, .priority-card p, .visual-checklist p, .spending-row span, label, ul { color: var(--text); }
+.ai-panel p:not(.label), .idea-card p, .visual-checklist p, .spending-row span, label, ul { color: var(--text); }
 .primary-button, .light-button { min-height: 44px; padding: 11px 18px; border-radius: 8px; font-size: 14px; font-weight: 600; line-height: 20px; text-align: center; transition: background .15s ease, border-color .15s ease; }
 body .primary-button { color: #fff; background: var(--green); border: 1px solid var(--green); }
 body .primary-button:hover { background: var(--green-deep); border-color: var(--green-deep); transform: none; }
@@ -68,16 +68,15 @@ input::placeholder { color: #73818c; }
 select option { color: var(--text); background: #fff; }
 input:focus, select:focus { border-color: var(--green); outline: 2px solid #25665345; outline-offset: 1px; }
 :is(a, button, summary):focus-visible { outline: 2px solid var(--green); outline-offset: 4px; }
-.spending-row, .saved-row, .renewal-row, .upcoming-row { border-color: var(--line); }
+.spending-row, .renewal-row, .upcoming-row { border-color: var(--line); }
 .spending-row strong { font-family: inherit; color: var(--text); }
-.security-note, .next-step, .sources-checked, .simple-badge, .privacy-badge, .coach-plan-meta,
+.next-step, .sources-checked, .simple-badge, .privacy-badge, .coach-plan-meta,
 .goal-type-badge, .setup-count, .trend-badge.neutral { background: #eff3f1; border-color: #d5dfda; color: #365b4d; }
-.security-note { font-size: 13px; }
 .visual-banner, .mini-bars, .ai-orbit { display: none; }
 .money-cards { gap: 20px; }
 .setup-guide { margin-bottom: 24px; }
 .setup-step, .setup-step.complete, .friendly-field, .friendly-field.featured-field, .income-preview,
-.plan-input-summary > div, .ai-paycheck-allocation > div, .ai-calendar-priorities li,
+.ai-paycheck-allocation > div, .ai-calendar-priorities li,
 .paycheck-summary, .plan-history-metrics span { background: #f7f9f8; border-color: var(--line); }
 .setup-step:hover, .stock-category-grid button:hover { transform: none; border-color: var(--green); }
 .setup-step.complete { background: #edf4ef; }
@@ -115,7 +114,7 @@ input:focus, select:focus { border-color: var(--green); outline: 2px solid #2566
 .goal-type-badge, .goal-date, .goal-progress-text, .goal-actions button { font-size: 12px; }
 .goal-card h2 { margin-top: 18px; }
 .empty-goals, .empty-plan-history, .empty-renewals { background: #f9fafb; color: var(--muted); border-color: var(--line); }
-.plan-input-summary span, .plan-history-card time, .plan-history-card > p, .plan-history-metrics span,
+.plan-history-card time, .plan-history-card > p, .plan-history-metrics span,
 .plan-history-card button, .coach-plan-meta, #coach-priorities span { font-size: 12px; }
 #coach-priorities strong { font-size: 15px; }
 #coach-priorities { gap: 16px; }
@@ -232,7 +231,6 @@ html[data-color-theme="dark"] .panel,
 html[data-color-theme="dark"] .card,
 html[data-color-theme="dark"] .idea-card,
 html[data-color-theme="dark"] .goal-card,
-html[data-color-theme="dark"] .priority-card,
 html[data-color-theme="dark"] .mini-stat,
 html[data-color-theme="dark"] .mini-dashboard-card,
 html[data-color-theme="dark"] .chart-panel,
@@ -257,12 +255,10 @@ html[data-color-theme="dark"] .setup-step.complete,
 html[data-color-theme="dark"] .friendly-field,
 html[data-color-theme="dark"] .friendly-field.featured-field,
 html[data-color-theme="dark"] .income-preview,
-html[data-color-theme="dark"] .plan-input-summary > div,
 html[data-color-theme="dark"] .ai-paycheck-allocation > div,
 html[data-color-theme="dark"] .ai-calendar-priorities li,
 html[data-color-theme="dark"] .paycheck-summary,
 html[data-color-theme="dark"] .plan-history-metrics span,
-html[data-color-theme="dark"] .security-note,
 html[data-color-theme="dark"] .next-step,
 html[data-color-theme="dark"] .sources-checked,
 html[data-color-theme="dark"] .simple-badge,
@@ -302,7 +298,7 @@ html[data-color-theme="dark"] .renewal-badge.overdue { color: #ed9fa7; backgroun
 
 /* Branded wealth-management layer: restrained depth, section identity, and clearer hierarchy. */
 body.theme-home, body.theme-ai { --page-accent: #276b56; --page-soft: #e8f1ed; --page-rgb: 39, 107, 86; }
-body.theme-money, body.theme-accounts, body.theme-subscriptions { --page-accent: #426b82; --page-soft: #e9f0f4; --page-rgb: 66, 107, 130; }
+body.theme-money, body.theme-subscriptions { --page-accent: #426b82; --page-soft: #e9f0f4; --page-rgb: 66, 107, 130; }
 body.theme-goals, body.theme-calendar { --page-accent: #96703f; --page-soft: #f4eee4; --page-rgb: 150, 112, 63; }
 body.theme-stocks, body.theme-ideas { --page-accent: #605b87; --page-soft: #efedf5; --page-rgb: 96, 91, 135; }
 body[class*="theme-"] { background-image: linear-gradient(180deg, rgba(var(--page-rgb), .035), transparent 360px); }
@@ -363,7 +359,7 @@ body[class*="theme-"] { background-image: linear-gradient(180deg, rgba(var(--pag
 .nav-group.active-group > summary, .primary-nav > a.active { color: var(--page-accent); }
 
 html[data-color-theme="dark"] body.theme-home, html[data-color-theme="dark"] body.theme-ai { --page-accent: #82b8a4; --page-soft: #1c2b27; }
-html[data-color-theme="dark"] body.theme-money, html[data-color-theme="dark"] body.theme-accounts, html[data-color-theme="dark"] body.theme-subscriptions { --page-accent: #85aec3; --page-soft: #1c2930; }
+html[data-color-theme="dark"] body.theme-money, html[data-color-theme="dark"] body.theme-subscriptions { --page-accent: #85aec3; --page-soft: #1c2930; }
 html[data-color-theme="dark"] body.theme-goals, html[data-color-theme="dark"] body.theme-calendar { --page-accent: #c5a475; --page-soft: #2d2921; }
 html[data-color-theme="dark"] body.theme-stocks, html[data-color-theme="dark"] body.theme-ideas { --page-accent: #aaa1ca; --page-soft: #262532; }
 html[data-color-theme="dark"] .welcome { background: linear-gradient(120deg, var(--page-soft), #182128 70%); border-color: rgba(var(--page-rgb), .34); }
